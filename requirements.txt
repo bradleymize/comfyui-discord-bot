@@ -1,0 +1,5 @@
+audioop-lts
+pillow
+python-dotenv
+py-cord
+websocket-client

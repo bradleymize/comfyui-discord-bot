@@ -1,0 +1,6 @@
+services:
+  prod:
+    build: .
+    network_mode: host
+    environment:
+      BOT_TYPE: PRODUCTION
