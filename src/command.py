@@ -1,13 +1,18 @@
 import discord
 import random
+import logging
+import asyncio
 
-from src.comfyui import ComfyUI
+import src.bot as my_bot
+import src.comfyui as my_comfyui
+
+log = logging.getLogger(__name__)
 
 
 class Command:
-    def initialize(self, bot):
+    def initialize(self, bot, websocket):
 
-        print("Initializing comfyui command")
+        log.info("Initializing comfyui command")
 
         @bot.command(description="Creates an AI image using ComfyUI") # this decorator makes a slash command
         # @discord.option("workflow", type=discord.SlashCommandOptionType.string, required=True)
@@ -25,6 +30,7 @@ class Command:
                 height: int,
                 steps: int
         ): # a slash command will be created with the name "ping"
+            req = my_bot.process_request(ctx)
             if seed is None:
                 seed = random.getrandbits(64)
             if width is None:
@@ -43,16 +49,29 @@ class Command:
                 'prompt': prompt
             }
 
-            msg = f"""Created image using the following config:
+            log.info("Calling comfyui.generate")
+            await ctx.defer()
+            # await req['channel'].send(msg)
+
+            prompt_id = await my_comfyui.generate(ctx, websocket, None, values_map)
+
+            queue_status = await my_comfyui.get_queue_information()
+            msg = f"""Queued an image with the following config:
 seed: {seed}
 width: {width}
 height: {height}
 steps: {steps}
-prompt: {prompt}"""
+prompt: {prompt}
+prompt id: {prompt_id}
+{queue_status}"""
 
-            comfyui = ComfyUI()
-            print("Calling comfyui.generate")
-            await ctx.defer()
-            image_buffer_list = await comfyui.generate(ctx, None, values_map)
-            print("sending image buffer response")
-            await ctx.followup.send(f"{msg}", files=image_buffer_list)
+            response = await ctx.followup.send(msg)
+            req['response'] = response
+
+            # log.info("sending image buffer response")
+            # await ctx.followup.send(files=image_buffer_list)
+            # await req['channel'].send(files=image_buffer_list)
+
+            # log.debug(f"queue before: {my_bot.message_queue}")
+            # my_bot.delete_message(ctx.interaction.id)
+            # log.debug(f"queue after: {my_bot.message_queue}")

@@ -3,3 +3,5 @@ pillow
 python-dotenv
 py-cord
 websocket-client
+websockets
+nest_asyncio
