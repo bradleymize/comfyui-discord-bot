@@ -1,9 +1,6 @@
 import discord
 from string import Template
 import json
-import urllib.request
-import urllib.parse
-import io
 import logging
 import aiohttp
 import uuid
@@ -17,7 +14,6 @@ log = logging.getLogger(__name__)
 
 async def generate(
         ctx: discord.ApplicationContext,
-        websocket,
         workflow: str,
         values_map: dict
 ):
@@ -28,25 +24,12 @@ async def generate(
     prompt = json.loads(prompt_config)
 
     log.info("Queueing prompt")
-    queue_response = await queue_prompt_2(prompt)
+    queue_response = await queue_prompt(prompt)
     prompt_id = queue_response['prompt_id']
     log.info(f"Got prompt id: {prompt_id}")
     my_bot.get_message(ctx.interaction.id)['prompt_id'] = prompt_id
 
     return prompt_id
-
-    # log.info("getting images")
-    # images = await get_images_2(websocket, prompt_id)
-    #
-    # image_buffer_list = []
-    #
-    # for node_id in images:
-    #     for image_data in images[node_id]:
-    #         log.info("converting image to buffer")
-    #         b = io.BytesIO(image_data)  # Discord requires io.BufferedIOBase, BytesIO inherits from BufferedIOBase
-    #         image_buffer_list.append(discord.File(b, 'image.png'))
-    # log.info("returning list of image buffers")
-    # return image_buffer_list
 
 # ====================================================================================
 
@@ -178,42 +161,7 @@ def get_workflow_template(workflow) -> Template:
 }
 """)
 
-# def queue_prompt(prompt):
-#     p = {"prompt": prompt, "client_id": client_id}
-#     data = json.dumps(p).encode('utf-8')
-#     log.info("queueing prompt")
-#     req =  urllib.request.Request("http://{}/prompt".format(server_address), data=data)
-#     return json.loads(urllib.request.urlopen(req).read())
-
-# def get_images(ctx:discord.ApplicationContext, ws, prompt):
-#     prompt_id = queue_prompt(prompt)['prompt_id']
-#     req = my_bot.get_message(ctx.interaction.id)
-#     req['prompt_id'] = prompt_id
-#     log.info(f"Got prompt id: {prompt_id}")
-#     output_images = {}
-#     current_node = ""
-#     while True:
-#         out = ws.recv()
-#         if isinstance(out, str):
-#             message = json.loads(out)
-#             if message['type'] == 'executing':
-#                 data = message['data']
-#                 if data['prompt_id'] == prompt_id:
-#                     if data['node'] is None:
-#                         break #Execution is done
-#                     else:
-#                         current_node = data['node']
-#         else:
-#             if current_node == 'save_image_websocket_node':
-#                 images_output = output_images.get(current_node, [])
-#                 images_output.append(out[8:])
-#                 output_images[current_node] = images_output
-#     log.info("generated images")
-#     return output_images
-
-# ====================================================================================
-
-async def queue_prompt_2(prompt):
+async def queue_prompt(prompt):
     async with aiohttp.ClientSession() as session:
         p = {"prompt": prompt, "client_id": client_id}
         data = json.dumps(p).encode('utf-8')
@@ -222,30 +170,7 @@ async def queue_prompt_2(prompt):
             if r.status == 200:
                 return await r.json()
 
-# TODO: This is blocking
-# async def get_images_2(ws, prompt_id):
-#     output_images = {}
-#     current_node = ""
-#     while True:
-#         out = await ws.recv()
-#         if isinstance(out, str):
-#             message = json.loads(out)
-#             if message['type'] == 'executing':
-#                 data = message['data']
-#                 print(f"Data: {data} - Prompt ID: {prompt_id}")
-#                 if 'prompt_id' in data:
-#                     if data['node'] is None:
-#                         break #Execution is done
-#                     else:
-#                         current_node = data['node']
-#         else:
-#             if current_node == 'save_image_websocket_node':
-#                 images_output = output_images.get(current_node, [])
-#                 images_output.append(out[8:])
-#                 output_images[current_node] = images_output
-#     log.info("generated images")
-#     return output_images
-
+# TODO: Error handling
 async def get_queue_information() -> str:
     async with aiohttp.ClientSession() as session:
         async with session.get("http://{}/queue".format(server_address)) as r:

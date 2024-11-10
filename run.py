@@ -1,7 +1,4 @@
 # https://discord.com/oauth2/authorize?client_id=1304485175660515408&permissions=277025703936&integration_type=0&scope=bot
-import threading
-from asyncio import AbstractEventLoop
-
 import discord
 import dotenv
 import os
@@ -51,19 +48,11 @@ async def main():
     log.info("connecting to websocket")
     async with connect("ws://{}/ws?clientId={}".format(server_address, client_id), max_size=None) as websocket:
         log.info("Starting long-term websocket watcher")
-        loop = asyncio.get_event_loop()
         asyncio.ensure_future(comfyui_watcher.listen_for_comfyui_messages(websocket))
-
-        # _thread = threading.Thread(target=asyncio.run, args=(comfyui_watcher.listen_for_comfyui_messages((websocket)),))
-        # _thread = threading.Thread(target=initialize_websocket_loop, args=(loop,websocket,))
-        # _thread = threading.Thread(target=comfyui_watcher.listen_for_comfyui_messages, args=(websocket,))
-        # _thread.start()
 
         cmd.initialize(bot, websocket)
         log.info("Starting bot")
         bot.run(token)
-
-        # loop.run_forever()
 
 
 def setup_logger():
@@ -73,10 +62,6 @@ def setup_logger():
         format='%(asctime)s [%(levelname)7s][%(name)15s]  %(message)s',
         stream=sys.stdout
     )
-
-# def initialize_websocket_loop(loop:AbstractEventLoop, websocket):
-#     asyncio.set_event_loop(loop)
-#     loop.run_until_complete(comfyui_watcher.listen_for_comfyui_messages(websocket))
 
 if __name__ == "__main__":
     asyncio.run(main())

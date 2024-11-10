@@ -5,7 +5,7 @@ import json
 import src.bot as my_bot
 
 log = logging.getLogger(__name__)
-
+# TODO: Error handling
 async def listen_for_comfyui_messages(ws):
     log.info("Beginning to listen for websocket messages")
     current_node = ""
