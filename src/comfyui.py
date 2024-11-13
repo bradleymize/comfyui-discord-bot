@@ -6,6 +6,7 @@ import aiohttp
 import uuid
 
 import src.bot as my_bot
+import src.botutils as botutils
 
 server_address = "127.0.0.1:8188"
 client_id = str(uuid.uuid4())
@@ -32,6 +33,13 @@ async def generate(
     return prompt_id
 
 # ====================================================================================
+async def queue_new_prompt(interaction: botutils.MyBotInteraction):
+    log.info("Queueing prompt")
+    prompt = interaction.get_prompt()
+    queue_response = await queue_prompt(prompt)
+    interaction.prompt_id = queue_response['prompt_id']
+    log.info(f"Got prompt id: {interaction.prompt_id}")
+    botutils.interaction_queue.append(interaction)
 
 def get_workflow_template(workflow) -> Template:
     return Template("""
@@ -160,6 +168,10 @@ def get_workflow_template(workflow) -> Template:
 }
 }
 """)
+
+def create_prompt(template: Template, values_map: dict) -> str:
+    prompt_config = template.substitute(**values_map)
+    return prompt_config
 
 async def queue_prompt(prompt):
     async with aiohttp.ClientSession() as session:

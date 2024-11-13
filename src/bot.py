@@ -1,3 +1,5 @@
+from typing import Union
+
 import discord
 import logging
 
@@ -38,7 +40,7 @@ def get_message_by_prompt_id(id:str):
         return msg_list[0]
     else:
         log.error(f"Unable to find message with id: {id}")
-        return {}
+        return None
 
 def delete_message(id:str):
     msg = get_message(id)
@@ -46,3 +48,4 @@ def delete_message(id:str):
         message_queue.remove(msg)
     else:
         log.warning(f"Unable to delete message with id: {id} - Not Found")
+
