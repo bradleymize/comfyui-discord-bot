@@ -1,9 +1,8 @@
 import discord
-import random
 import logging
 
-import src.bot as my_bot
 import src.comfyui as my_comfyui
+from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue, Reaction
 
 log = logging.getLogger(__name__)
 
@@ -28,44 +27,37 @@ class Command:
                 width: int,
                 height: int,
                 steps: int
-        ): # a slash command will be created with the name "ping"
-            req = my_bot.process_request(ctx)
-            if seed is None:
-                seed_num = random.getrandbits(64)
-            else:
-                seed_num = int(seed) # TODO: error handling
-            if width is None:
-                width = 1024
-            if height is None:
-                height = 1024
-            if steps is None:
-                steps = 4
+        ): # a slash command will be created with the name "comfyui"
+            log.info("Creating new ComfyUICommand object")
+            comfy_ui_command = ComfyUICommand(
+                ctx=ctx,
+                prompt=prompt,
+                seed=seed,
+                width=width,
+                height=height,
+                steps=steps,
+                cfg=1
+            )
+            values_map = comfy_ui_command.get_values_map()
 
-            prompt = prompt.replace("\"", "\\\"")
-
-            values_map = {
-                'seed': seed_num,
-                'width': width,
-                'height': height,
-                'steps': steps,
-                'cfg': 1,
-                'prompt': prompt
-            }
+            interaction = await MyBotInteraction.create(bot=bot, data=comfy_ui_command)
+            interaction_queue.append(interaction)
 
             log.info("Calling comfyui.generate")
             await ctx.defer()
 
-            prompt_id = await my_comfyui.generate(ctx, None, values_map)
+            prompt_id = await my_comfyui.generate(interaction)
 
             queue_status = await my_comfyui.get_queue_information()
+            # TODO: Add workflow to output
             msg = f"""Queued an image with the following config:
-seed: {seed_num}
-width: {width}
-height: {height}
-steps: {steps}
-prompt: {prompt}
+seed: {values_map['seed']}
+width: {values_map['width']}
+height: {values_map['height']}
+steps: {values_map['steps']}
+prompt: {values_map['prompt']}
 prompt id: {prompt_id}
 {queue_status}"""
 
             response = await ctx.followup.send(msg)
-            req['response'] = response
+            interaction.reply_to = response

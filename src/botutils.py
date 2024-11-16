@@ -10,12 +10,15 @@ import json
 log = logging.getLogger(__name__)
 interaction_queue = []
 
+# TODO: Support deleting via reaction
 class Reaction(Enum):
     REPEAT = "🔁"
+    DELETE = "❌"
 
 class InteractionType(Enum):
     COMFY_UI_COMMAND = 1
     REPEAT = 2
+    DELETE = 3
 
 class ComfyUICommand():
     def __init__(
@@ -36,7 +39,13 @@ class ComfyUICommand():
         if seed is None:
             self.seed = random.getrandbits(64)
         else:
-            self.seed = int(seed)
+            self.seed = int(seed) #TODO: Error handling
+        if width is None:
+            width = 1024
+        if height is None:
+            height = 1024
+        if steps is None:
+            steps = 4
 
         self.width = width
         self.height = height
@@ -44,8 +53,8 @@ class ComfyUICommand():
         self.cfg = cfg
 
     def get_values_map(self) -> dict:
-        return {
-            'eeed': self.seed,
+        return { #TODO: Add workflow
+            'seed': self.seed,
             'width': self.width,
             'height': self.height,
             'steps': self.steps,
@@ -56,6 +65,7 @@ class ComfyUICommand():
 class MyBotInteraction():
     interaction_type: InteractionType
     mention: Union[None, discord.User, discord.Member] = None
+    message: Union[None, discord.Message] = None
     reply_to: Union[None, discord.Message] = None
     data: Union[discord.RawReactionActionEvent, ComfyUICommand]
     values_map: dict
@@ -73,12 +83,15 @@ class MyBotInteraction():
         if isinstance(data, discord.RawReactionActionEvent):
             if data.emoji.name == Reaction.REPEAT.value:
                 self.interaction_type = InteractionType.REPEAT
+            elif data.emoji.name == Reaction.DELETE.value:
+                self.interaction_type = InteractionType.DELETE
             else:
                 raise Exception(f"Unsupported reaction: {data.emoji.name}")
 
+            #TODO: Add error handling for fetching stuff (e.g. try deleting different bot message, try deleting queue message)
             channel = await bot.fetch_channel(data.channel_id)
-            message = await channel.fetch_message(data.message_id)
-            self.reply_to = await channel.fetch_message(message.reference.message_id)
+            self.message = await channel.fetch_message(data.message_id)
+            self.reply_to = await channel.fetch_message(self.message.reference.message_id)
             self.mention = await bot.fetch_user(data.user_id)
             self.values_map = parse_message(self.reply_to.content)
 
@@ -95,6 +108,7 @@ class MyBotInteraction():
         return self
 
     def get_prompt(self):
+        log.info("Getting workflow template and prompt")
         # TODO: replace "default" with variable
         prompt_config = get_and_fill_template("default.json.template", self.values_map)
         prompt = json.loads(prompt_config)
@@ -103,8 +117,10 @@ class MyBotInteraction():
     def __repr__(self):
         return f"MyBotInteraction({self.interaction_type.name}, mention {self.mention} when replying to message {self.reply_to.id})\n{self.values_map}"
 
-def is_valid_reaction(emoji: str) -> bool:
-    return emoji in Reaction
+def is_valid_reaction(payload: discord.RawReactionActionEvent) -> bool:
+    emoji_name = payload.emoji.name
+    is_bot = payload.member.bot
+    return emoji_name in Reaction and not is_bot
 
 def parse_message(msg: str) -> Union[dict, None]:
     lines = msg.splitlines()
@@ -122,7 +138,7 @@ def parse_message(msg: str) -> Union[dict, None]:
 
         prompt_id = lines.pop(0) # Unused, prompt_id will be populated
 
-        return {
+        return { #TODO: Include workflow
             'seed': seed,
             'width': width,
             'height': height,

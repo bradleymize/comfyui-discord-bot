@@ -1,12 +1,12 @@
-import discord
-from string import Template
+#TODO: rename to comfyutils
+
 import json
 import logging
 import aiohttp
 import uuid
 
-import src.bot as my_bot
 import src.botutils as botutils
+from src.botutils import MyBotInteraction
 
 server_address = "127.0.0.1:8188"
 client_id = str(uuid.uuid4())
@@ -14,26 +14,21 @@ log = logging.getLogger(__name__)
 
 
 async def generate(
-        ctx: discord.ApplicationContext,
-        workflow: str,
-        values_map: dict
+        interaction: MyBotInteraction
 ):
-
-    log.info("getting template")
-    tpl = get_workflow_template(workflow)
-    prompt_config = tpl.substitute(**values_map)
-    prompt = json.loads(prompt_config)
+    prompt = interaction.get_prompt()
 
     log.info("Queueing prompt")
     queue_response = await queue_prompt(prompt)
     prompt_id = queue_response['prompt_id']
     log.info(f"Got prompt id: {prompt_id}")
-    my_bot.get_message(ctx.interaction.id)['prompt_id'] = prompt_id
+    interaction.prompt_id = prompt_id
 
     return prompt_id
 
 # ====================================================================================
-async def queue_new_prompt(interaction: botutils.MyBotInteraction):
+
+async def queue_new_prompt(interaction: MyBotInteraction):
     log.info("Queueing prompt")
     prompt = interaction.get_prompt()
     queue_response = await queue_prompt(prompt)
@@ -41,137 +36,138 @@ async def queue_new_prompt(interaction: botutils.MyBotInteraction):
     log.info(f"Got prompt id: {interaction.prompt_id}")
     botutils.interaction_queue.append(interaction)
 
-def get_workflow_template(workflow) -> Template:
-    return Template("""
-{
-"3": {
-"inputs": {
-  "seed": ${seed},
-  "steps": ${steps},
-  "cfg": ${cfg},
-  "sampler_name": "dpmpp_2m",
-  "scheduler": "sgm_uniform",
-  "denoise": 1,
-  "model": [
-    "10",
-    0
-  ],
-  "positive": [
-    "6",
-    0
-  ],
-  "negative": [
-    "7",
-    0
-  ],
-  "latent_image": [
-    "5",
-    0
-  ]
-},
-"class_type": "KSampler",
-"_meta": {
-  "title": "KSampler"
-}
-},
-"5": {
-"inputs": {
-  "width": ${width},
-  "height": ${height},
-  "batch_size": 1
-},
-"class_type": "EmptyLatentImage",
-"_meta": {
-  "title": "Empty Latent Image"
-}
-},
-"6": {
-"inputs": {
-  "text": "${prompt}",
-  "clip": [
-    "11",
-    0
-  ]
-},
-"class_type": "CLIPTextEncode",
-"_meta": {
-  "title": "CLIP Text Encode (Prompt)"
-}
-},
-"7": {
-"inputs": {
-  "text": "",
-  "clip": [
-    "11",
-    0
-  ]
-},
-"class_type": "CLIPTextEncode",
-"_meta": {
-  "title": "CLIP Text Encode (Prompt)"
-}
-},
-"8": {
-"inputs": {
-  "samples": [
-    "3",
-    0
-  ],
-  "vae": [
-    "12",
-    0
-  ]
-},
-"class_type": "VAEDecode",
-"_meta": {
-  "title": "VAE Decode"
-}
-},
-"10": {
-"inputs": {
-  "unet_name": "pixelwave_flux1Schnell03.safetensors",
-  "weight_dtype": "fp8_e4m3fn"
-},
-"class_type": "UNETLoader",
-"_meta": {
-  "title": "Load Diffusion Model"
-}
-},
-"11": {
-"inputs": {
-  "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
-  "clip_name2": "clip_l.safetensors",
-  "type": "flux"
-},
-"class_type": "DualCLIPLoader",
-"_meta": {
-  "title": "DualCLIPLoader"
-}
-},
-"12": {
-"inputs": {
-  "vae_name": "ae.safetensors"
-},
-"class_type": "VAELoader",
-"_meta": {
-  "title": "Load VAE"
-}
-},
-"save_image_websocket_node": {
-"class_type": "SaveImageWebsocket",
-"inputs": {
-  "images": [
-    "8",
-    0
-  ]
-}
-}
-}
-""")
 
-def create_prompt(template: Template, values_map: dict) -> str:
-    prompt_config = template.substitute(**values_map)
-    return prompt_config
+# def get_workflow_template(workflow) -> Template:
+#     return Template("""
+# {
+# "3": {
+# "inputs": {
+#   "seed": ${seed},
+#   "steps": ${steps},
+#   "cfg": ${cfg},
+#   "sampler_name": "dpmpp_2m",
+#   "scheduler": "sgm_uniform",
+#   "denoise": 1,
+#   "model": [
+#     "10",
+#     0
+#   ],
+#   "positive": [
+#     "6",
+#     0
+#   ],
+#   "negative": [
+#     "7",
+#     0
+#   ],
+#   "latent_image": [
+#     "5",
+#     0
+#   ]
+# },
+# "class_type": "KSampler",
+# "_meta": {
+#   "title": "KSampler"
+# }
+# },
+# "5": {
+# "inputs": {
+#   "width": ${width},
+#   "height": ${height},
+#   "batch_size": 1
+# },
+# "class_type": "EmptyLatentImage",
+# "_meta": {
+#   "title": "Empty Latent Image"
+# }
+# },
+# "6": {
+# "inputs": {
+#   "text": "${prompt}",
+#   "clip": [
+#     "11",
+#     0
+#   ]
+# },
+# "class_type": "CLIPTextEncode",
+# "_meta": {
+#   "title": "CLIP Text Encode (Prompt)"
+# }
+# },
+# "7": {
+# "inputs": {
+#   "text": "",
+#   "clip": [
+#     "11",
+#     0
+#   ]
+# },
+# "class_type": "CLIPTextEncode",
+# "_meta": {
+#   "title": "CLIP Text Encode (Prompt)"
+# }
+# },
+# "8": {
+# "inputs": {
+#   "samples": [
+#     "3",
+#     0
+#   ],
+#   "vae": [
+#     "12",
+#     0
+#   ]
+# },
+# "class_type": "VAEDecode",
+# "_meta": {
+#   "title": "VAE Decode"
+# }
+# },
+# "10": {
+# "inputs": {
+#   "unet_name": "pixelwave_flux1Schnell03.safetensors",
+#   "weight_dtype": "fp8_e4m3fn"
+# },
+# "class_type": "UNETLoader",
+# "_meta": {
+#   "title": "Load Diffusion Model"
+# }
+# },
+# "11": {
+# "inputs": {
+#   "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+#   "clip_name2": "clip_l.safetensors",
+#   "type": "flux"
+# },
+# "class_type": "DualCLIPLoader",
+# "_meta": {
+#   "title": "DualCLIPLoader"
+# }
+# },
+# "12": {
+# "inputs": {
+#   "vae_name": "ae.safetensors"
+# },
+# "class_type": "VAELoader",
+# "_meta": {
+#   "title": "Load VAE"
+# }
+# },
+# "save_image_websocket_node": {
+# "class_type": "SaveImageWebsocket",
+# "inputs": {
+#   "images": [
+#     "8",
+#     0
+#   ]
+# }
+# }
+# }
+# """)
+#
+# def create_prompt(template: Template, values_map: dict) -> str:
+#     prompt_config = template.substitute(**values_map)
+#     return prompt_config
 
 async def queue_prompt(prompt):
     async with aiohttp.ClientSession() as session:

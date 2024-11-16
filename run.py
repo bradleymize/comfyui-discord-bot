@@ -1,4 +1,5 @@
 # https://discord.com/oauth2/authorize?client_id=1304485175660515408&permissions=277025703936&integration_type=0&scope=bot
+from code import interact
 
 import discord
 import dotenv
@@ -47,22 +48,28 @@ async def main():
         log.info(f"{bot.user} is ready and online!")
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"version: {os.getenv('VERSION')}"))
 
+    #TODO: Move to command.py
     @bot.listen
     async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-        log.info("Processing reaction")
+        log.info(f"Processing reaction: {payload.emoji.name}")
 
-        if botutils.is_valid_reaction(payload.emoji.name):
-            # emoji is a supported reaction
-            interaction = await MyBotInteraction.create(bot=bot, data=payload)
-            if isinstance(interaction.values_map, dict):
-                log.info("queueing prompt stuff")
-                await comfyui.queue_new_prompt(interaction)
-                status = await comfyui.get_queue_information()
-                await interaction.reply_to.channel.send(f"{interaction.mention.mention}, regenerating the image with a new seed... {status}")
-            else:
-                log.warning("Message is not one that can regenerate stuff")
+        if botutils.is_valid_reaction(payload):
+
+            if payload.emoji.name == botutils.Reaction.REPEAT.value:
+                # emoji is a supported reaction
+                interaction = await MyBotInteraction.create(bot=bot, data=payload)
+                if isinstance(interaction.values_map, dict):
+                    log.info("queueing prompt stuff")
+                    await comfyui.queue_new_prompt(interaction)
+                    status = await comfyui.get_queue_information()
+                    await interaction.reply_to.channel.send(f"{interaction.mention.mention}, regenerating the image with a new seed... {status}")
+                else:
+                    log.warning("Message is not one that can regenerate stuff")
+            elif payload.emoji.name == botutils.Reaction.DELETE.value:
+                interaction = await MyBotInteraction.create(bot=bot, data=payload)
+                await interaction.message.delete()
         else:
-            log.info(f"{payload.emoji.name} is not a supported reaction, ignoring")
+            log.info(f"{payload.emoji.name} is not a supported reaction or added by bot, ignoring")
 
 
 
