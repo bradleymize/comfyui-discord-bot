@@ -11,12 +11,9 @@ import asyncio
 import nest_asyncio
 from websockets.asyncio.client import connect
 
-from src.botutils import MyBotInteraction, is_valid_reaction
 from src.command import Command
 from src.comfyui import server_address, client_id
 import src.comfyuiwatcher as comfyui_watcher
-import src.comfyui as comfyui
-import src.botutils as botutils
 
 nest_asyncio.apply()
 
@@ -47,31 +44,6 @@ async def main():
     async def on_ready():
         log.info(f"{bot.user} is ready and online!")
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"version: {os.getenv('VERSION')}"))
-
-    #TODO: Move to command.py
-    @bot.listen
-    async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-        log.info(f"Processing reaction: {payload.emoji.name}")
-
-        if botutils.is_valid_reaction(payload):
-
-            if payload.emoji.name == botutils.Reaction.REPEAT.value:
-                # emoji is a supported reaction
-                interaction = await MyBotInteraction.create(bot=bot, data=payload)
-                if isinstance(interaction.values_map, dict):
-                    log.info("queueing prompt stuff")
-                    await comfyui.queue_new_prompt(interaction)
-                    status = await comfyui.get_queue_information()
-                    await interaction.reply_to.channel.send(f"{interaction.mention.mention}, regenerating the image with a new seed... {status}")
-                else:
-                    log.warning("Message is not one that can regenerate stuff")
-            elif payload.emoji.name == botutils.Reaction.DELETE.value:
-                interaction = await MyBotInteraction.create(bot=bot, data=payload)
-                await interaction.message.delete()
-        else:
-            log.info(f"{payload.emoji.name} is not a supported reaction or added by bot, ignoring")
-
-
 
     log.info("connecting to websocket")
     async with connect("ws://{}/ws?clientId={}".format(server_address, client_id), max_size=None) as websocket:

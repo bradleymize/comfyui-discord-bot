@@ -2,7 +2,7 @@ import discord
 import logging
 
 import src.comfyui as my_comfyui
-from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue, Reaction
+from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue, is_valid_reaction, Reaction
 
 log = logging.getLogger(__name__)
 
@@ -61,3 +61,28 @@ prompt id: {prompt_id}
 
             response = await ctx.followup.send(msg)
             interaction.reply_to = response
+
+
+        @bot.listen
+        async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
+            # TODO: See if the message being reacted to was sent by this bot instance (how to get bot instance)
+            # TODO:    e.g. to prevent prod bot from processing dev bot reactions
+            log.info(f"Processing reaction: {payload.emoji.name}")
+
+            if is_valid_reaction(payload, bot.user.id):
+
+                if payload.emoji.name == Reaction.REPEAT.value:
+                    # emoji is a supported reaction
+                    interaction = await MyBotInteraction.create(bot=bot, data=payload)
+                    if isinstance(interaction.values_map, dict):
+                        log.info("queueing prompt stuff")
+                        await my_comfyui.queue_new_prompt(interaction)
+                        status = await my_comfyui.get_queue_information()
+                        await interaction.reply_to.channel.send(f"{interaction.mention.mention}, regenerating the image with a new seed... {status}")
+                    else:
+                        log.warning("Message is not one that can regenerate stuff")
+                elif payload.emoji.name == Reaction.DELETE.value:
+                    interaction = await MyBotInteraction.create(bot=bot, data=payload)
+                    await interaction.message.delete()
+            else:
+                log.info(f"{payload.emoji.name} is not a supported reaction or added by bot, ignoring")

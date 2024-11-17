@@ -117,10 +117,13 @@ class MyBotInteraction():
     def __repr__(self):
         return f"MyBotInteraction({self.interaction_type.name}, mention {self.mention} when replying to message {self.reply_to.id})\n{self.values_map}"
 
-def is_valid_reaction(payload: discord.RawReactionActionEvent) -> bool:
+def is_valid_reaction(payload: discord.RawReactionActionEvent, bot_id: int) -> bool:
     emoji_name = payload.emoji.name
     is_bot = payload.member.bot
-    return emoji_name in Reaction and not is_bot
+    # Must be a supported emoji
+    # Must not be added by a bot
+    # Message it was added to must be created by THIS bot
+    return emoji_name in Reaction and not is_bot and payload.data['message_author_id'] == str(bot_id)
 
 def parse_message(msg: str) -> Union[dict, None]:
     lines = msg.splitlines()
