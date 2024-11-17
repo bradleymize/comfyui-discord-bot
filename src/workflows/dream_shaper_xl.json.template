@@ -1,7 +1,7 @@
 {
   "3": {
     "inputs": {
-      "seed": 203236410398179,
+      "seed": ${seed},
       "steps": 8,
       "cfg": 2,
       "sampler_name": "dpmpp_sde",
@@ -40,8 +40,8 @@
   },
   "5": {
     "inputs": {
-      "width": 768,
-      "height": 1024,
+      "width": ${width},
+      "height": ${height},
       "batch_size": 1
     },
     "class_type": "EmptyLatentImage",
@@ -51,7 +51,7 @@
   },
   "6": {
     "inputs": {
-      "text": "medium shot, cinematic film still, photo of a handsome man with a beard near grasses wearing a white tshirt, fictional landscapes, (intense sunlight:1.4), detailed, brooding mood, detailed character expressions, light amber and red, amazing quality, wallpaper, analog film grain\n",
+      "text": "${prompt}",
       "clip": [
         "4",
         1
@@ -91,17 +91,13 @@
       "title": "VAE Decode"
     }
   },
-  "9": {
-    "inputs": {
-      "filename_prefix": "ComfyUI",
-      "images": [
-        "8",
-        0
-      ]
-    },
-    "class_type": "SaveImage",
-    "_meta": {
-      "title": "Save Image"
+  "save_image_websocket_node": {
+      "class_type": "SaveImageWebsocket",
+      "inputs": {
+        "images": [
+          "8",
+          0
+        ]
+      }
     }
-  }
 }

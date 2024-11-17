@@ -10,7 +10,6 @@ import json
 log = logging.getLogger(__name__)
 interaction_queue = []
 
-# TODO: Support deleting via reaction
 class Reaction(Enum):
     REPEAT = "🔁"
     DELETE = "❌"
@@ -20,12 +19,13 @@ class InteractionType(Enum):
     REPEAT = 2
     DELETE = 3
 
+# TODO: Defaults for given workflow (width / height / steps / cfg scale)
 class ComfyUICommand():
     def __init__(
             self,
             ctx: discord.ApplicationContext,
             prompt: str,
-            workflow: str = "default",
+            workflow: str = "default.json.template",
             seed: str = None,
             width: int = 1024,
             height: int = 1024,
@@ -34,7 +34,7 @@ class ComfyUICommand():
     ):
         self.ctx = ctx
         self.prompt = prompt.replace("\"", "\\\"") # Make prompt JSON friendly
-        self.workflow = f"{workflow}.json.template"
+        self.workflow = workflow
 
         if seed is None:
             self.seed = random.getrandbits(64)
@@ -53,7 +53,8 @@ class ComfyUICommand():
         self.cfg = cfg
 
     def get_values_map(self) -> dict:
-        return { #TODO: Add workflow
+        return {
+            'workflow': self.workflow,
             'seed': self.seed,
             'width': self.width,
             'height': self.height,
@@ -101,7 +102,6 @@ class MyBotInteraction():
             self.interaction_type = InteractionType.COMFY_UI_COMMAND
             self.mention = data.ctx.interaction.user
             self.values_map = data.get_values_map()
-            # TODO: Set reply_to after initially replying to /comfyui application command
         else:
             raise Exception(f"Unsupported interaction data: {type(data)}")
 
@@ -109,8 +109,7 @@ class MyBotInteraction():
 
     def get_prompt(self):
         log.info("Getting workflow template and prompt")
-        # TODO: replace "default" with variable
-        prompt_config = get_and_fill_template("default.json.template", self.values_map)
+        prompt_config = get_and_fill_template(self.values_map)
         prompt = json.loads(prompt_config)
         return prompt
 
@@ -129,7 +128,7 @@ def parse_message(msg: str) -> Union[dict, None]:
     lines = msg.splitlines()
 
     if lines.pop(0).startswith("Queued an image"):
-        # TODO: Include workflow
+        workflow = lines.pop(0).split(': ')[1]
         seed = lines.pop(0).split(': ')[1]
         width = lines.pop(0).split(': ')[1]
         height = lines.pop(0).split(': ')[1]
@@ -141,7 +140,8 @@ def parse_message(msg: str) -> Union[dict, None]:
 
         prompt_id = lines.pop(0) # Unused, prompt_id will be populated
 
-        return { #TODO: Include workflow
+        return {
+            'workflow': workflow,
             'seed': seed,
             'width': width,
             'height': height,
@@ -153,8 +153,9 @@ def parse_message(msg: str) -> Union[dict, None]:
         log.warning("Message is not parseable")
         return None
 
-def get_and_fill_template(workflow: str, values_map: dict) -> str:
-    workflow_template_text = importlib.resources.read_text("src.workflows", workflow)
+def get_and_fill_template(values_map: dict) -> str:
+    log.info(f"Getting workflow: {values_map['workflow']}")
+    workflow_template_text = importlib.resources.read_text("src.workflows", values_map['workflow'])
     tpl = Template(workflow_template_text)
     prompt_config = tpl.substitute(**values_map)
     return prompt_config

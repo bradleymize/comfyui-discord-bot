@@ -1,5 +1,6 @@
 import discord
 import logging
+import os
 
 import src.comfyui as my_comfyui
 from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue, is_valid_reaction, Reaction
@@ -10,19 +11,24 @@ log = logging.getLogger(__name__)
 class Command:
     def initialize(self, bot, websocket):
 
+        def get_workflows(ctx: discord.commands.context.AutocompleteContext):
+            package_dir = "src/workflows"
+            files = os.listdir(package_dir)
+            return files
+
         log.info("Initializing comfyui command")
 
         @bot.command(description="Creates an AI image using ComfyUI") # this decorator makes a slash command
-        # @discord.option("workflow", type=discord.SlashCommandOptionType.string, required=True)
         @discord.option("prompt", type=discord.SlashCommandOptionType.string, required=True, description="Describe the image you wish to create")
+        @discord.option("workflow", type=discord.SlashCommandOptionType.string, required=True, description="The workflow to use for generating the image", default="default.json.template", autocomplete=discord.utils.basic_autocomplete(get_workflows))
         @discord.option("seed", type=discord.SlashCommandOptionType.string, required=False, description="Number used to help re-create images. Default: (random)")
         @discord.option("width", type=discord.SlashCommandOptionType.integer, required=False, description="The desired width of the generated image. Default: 1024")
         @discord.option("height", type=discord.SlashCommandOptionType.integer, required=False, description="The desired height of the generated image. Default: 1024")
         @discord.option("steps", type=discord.SlashCommandOptionType.integer, required=False, description="The number of iterations to perform when generating the image. Default: 4")
         async def comfyui(
                 ctx: discord.ApplicationContext,
-                # workflow: str,
                 prompt: str,
+                workflow: str,
                 seed: str,
                 width: int,
                 height: int,
@@ -31,6 +37,7 @@ class Command:
             log.info("Creating new ComfyUICommand object")
             comfy_ui_command = ComfyUICommand(
                 ctx=ctx,
+                workflow=workflow,
                 prompt=prompt,
                 seed=seed,
                 width=width,
@@ -49,8 +56,8 @@ class Command:
             prompt_id = await my_comfyui.generate(interaction)
 
             queue_status = await my_comfyui.get_queue_information()
-            # TODO: Add workflow to output
             msg = f"""Queued an image with the following config:
+workflow: {values_map['workflow']}
 seed: {values_map['seed']}
 width: {values_map['width']}
 height: {values_map['height']}
@@ -65,8 +72,6 @@ prompt id: {prompt_id}
 
         @bot.listen
         async def on_raw_reaction_add(payload: discord.RawReactionActionEvent):
-            # TODO: See if the message being reacted to was sent by this bot instance (how to get bot instance)
-            # TODO:    e.g. to prevent prod bot from processing dev bot reactions
             log.info(f"Processing reaction: {payload.emoji.name}")
 
             if is_valid_reaction(payload, bot.user.id):
@@ -86,3 +91,12 @@ prompt id: {prompt_id}
                     await interaction.message.delete()
             else:
                 log.info(f"{payload.emoji.name} is not a supported reaction or added by bot, ignoring")
+
+
+        @bot.command(description="Lists the available workflows")
+        async def workflows(
+                ctx: discord.ApplicationContext,
+                workflow: str
+        ):
+            log.info(f"Got workflow: {workflow}")
+            await ctx.respond(f"Selected {workflow}", ephemeral=True)
