@@ -1,0 +1,10 @@
+[run]
+branch = true
+source =
+    .
+    src
+omit =
+    /usr/*
+    venv/*
+    */src/testutils/*
+    *_test.py

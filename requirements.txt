@@ -5,3 +5,5 @@ py-cord
 websocket-client
 websockets
 nest_asyncio
+pytest
+pytest-cov
