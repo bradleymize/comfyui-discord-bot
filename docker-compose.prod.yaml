@@ -1,6 +1,6 @@
 services:
   prod:
-    image: comfyui-discord-bot-prod:${VERSION}
+    image: comfyui-discord-bot-prod:0.1.0
     build: .
     network_mode: host
     environment:

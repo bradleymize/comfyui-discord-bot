@@ -162,11 +162,17 @@ def get_and_fill_template(values_map: dict) -> str:
 
 def get_interaction_by_prompt_id(prompt_id: str) -> MyBotInteraction:
     interaction_list = [interaction for interaction in interaction_queue if interaction.prompt_id == prompt_id]
-    if len(interaction_list) > 0:
+    if len(interaction_list) == 1:
+        return interaction_list[0]
+    elif len(interaction_list) > 1:
+        log.warning("Multiple interactions found, returning the first one, but this shouldn't happen")
         return interaction_list[0]
     else:
         raise Exception(f"Unable to find interaction with prompt_id: {prompt_id}")
 
 def remove_interaction(interaction: MyBotInteraction):
     log.info("Removing interaction from queue")
-    interaction_queue.remove(interaction)
+    try:
+        interaction_queue.remove(interaction)
+    except ValueError:
+        log.warning("Nothing to remove, interaction is not in the queue")
