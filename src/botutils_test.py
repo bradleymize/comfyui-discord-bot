@@ -1,8 +1,192 @@
 import logging
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch, AsyncMock
 import pytest
 import botutils
+import discord
 from testutils.mock import create_mock_object
+
+class Test_ComfyUICommand():
+    def test_populates_defaults(self):
+        expected = 'A simple prompt'
+        cmd = botutils.ComfyUICommand(
+            MagicMock(),
+            'A simple prompt',
+        )
+        assert cmd.prompt == expected
+        assert cmd.workflow == "default.json.template"
+        assert cmd.seed is not None
+        assert cmd.width == 1024
+        assert cmd.height == 1024
+        assert cmd.steps == 4
+        assert cmd.cfg == 1
+
+    def test_sets_overrides(self):
+        expected = 'A simple prompt'
+        cmd = botutils.ComfyUICommand(
+            MagicMock(),
+            'A simple prompt',
+            "my.workflow",
+            '1',
+            2,
+            3,
+            8,
+            9
+        )
+        assert cmd.prompt == expected
+        assert cmd.workflow == "my.workflow"
+        assert cmd.seed == 1
+        assert cmd.width == 2
+        assert cmd.height == 3
+        assert cmd.steps == 8
+        assert cmd.cfg == 9
+
+    def test_makes_prompt_json_friendly(self):
+        expected = 'A \\"complex\\" prompt'
+        cmd = botutils.ComfyUICommand(
+            MagicMock(),
+            'A "complex" prompt',
+        )
+        assert cmd.prompt == expected
+
+    def test_returns_configuration(self):
+        cmd = botutils.ComfyUICommand(
+            MagicMock(),
+            'A simple prompt',
+            "my.workflow",
+            '1',
+            2,
+            3,
+            8,
+            9
+        )
+        values_map = cmd.get_values_map()
+        assert values_map['workflow'] == "my.workflow"
+        assert values_map['seed'] == 1
+        assert values_map['width'] == 2
+        assert values_map['height'] == 3
+        assert values_map['steps'] == 8
+        assert values_map['cfg'] == 9
+        assert values_map['prompt'] == "A simple prompt"
+
+class Test_MyBotInteraction():
+    @pytest.mark.asyncio
+    async def test_create_raises_exception_if_not_supported_data_type(self):
+        with pytest.raises(Exception, match=f"Unsupported interaction data: foo"):
+            mock_data = MagicMock()
+            type(mock_data).__name__ = "foo"
+            await botutils.MyBotInteraction.create(MagicMock(), mock_data)
+
+    @pytest.mark.asyncio
+    async def test_creates_instance_using_comfy_ui_command(self):
+        ctx = create_mock_object({
+            'interaction': {
+                'user': 'foobar'
+            }
+        })
+        cmd = botutils.ComfyUICommand(
+            ctx,
+            'A simple prompt',
+        )
+        interaction = await botutils.MyBotInteraction.create(MagicMock(), cmd)
+        assert interaction.interaction_type == botutils.InteractionType.COMFY_UI_COMMAND
+        assert interaction.mention == 'foobar'
+        assert interaction.values_map['width'] == 1024
+
+    @pytest.mark.asyncio
+    @patch('random.getrandbits')
+    @patch('botutils.parse_message')
+    async def test_create_handles_repeat_reaction(self, mock_parse_message, mock_getrandbits):
+        reaction = create_mock_object({
+            'channel_id': 1,
+            'message_id': 2,
+            'user_id': 3,
+            'emoji': {
+                'name': botutils.Reaction.REPEAT.value
+            }
+        })
+        reaction.__class__ = discord.RawReactionActionEvent
+
+        channel_mock = MagicMock()
+        channel_mock.fetch_message = AsyncMock(side_effect=[
+            create_mock_object({
+                'reference': {
+                    'message_id': 'reference to original message'
+                }
+            }),
+            create_mock_object({
+                'content': 'the original message'
+            })
+        ])
+
+        bot_mock = MagicMock()
+        bot_mock.fetch_channel = AsyncMock(return_value=channel_mock)
+        bot_mock.fetch_user = AsyncMock(return_value="John Doe")
+
+        mock_parse_message.return_value = {'seed': 1}
+        mock_getrandbits.return_value = 4
+
+        interaction = await botutils.MyBotInteraction.create(bot_mock, reaction)
+
+        assert interaction.message.reference.message_id == "reference to original message"
+        assert interaction.reply_to.content == "the original message"
+        assert interaction.mention == "John Doe"
+        assert interaction.values_map['seed'] == 4
+        bot_mock.fetch_channel.assert_called_with(1)
+        channel_mock.fetch_message.mock_calls[0].assert_called_with(2)
+        channel_mock.fetch_message.mock_calls[1].assert_called_with("reference to original message")
+        bot_mock.fetch_user.assert_called_with(3)
+
+    @pytest.mark.asyncio
+    @patch('botutils.parse_message')
+    async def test_create_handles_delete_reaction(self, mock_parse_message):
+        reaction = create_mock_object({
+            'channel_id': 1,
+            'message_id': 2,
+            'user_id': 3,
+            'emoji': {
+                'name': botutils.Reaction.DELETE.value
+            }
+        })
+        reaction.__class__ = discord.RawReactionActionEvent
+
+        channel_mock = MagicMock()
+        channel_mock.fetch_message = AsyncMock(side_effect=[
+            create_mock_object({
+                'reference': {
+                    'message_id': 'reference to original message'
+                }
+            }),
+            create_mock_object({
+                'content': 'the original message'
+            })
+        ])
+
+        bot_mock = MagicMock()
+        bot_mock.fetch_channel = AsyncMock(return_value=channel_mock)
+        bot_mock.fetch_user = AsyncMock(return_value="John Doe")
+
+        mock_parse_message.return_value = {'seed': 1}
+
+        interaction = await botutils.MyBotInteraction.create(bot_mock, reaction)
+
+        assert interaction.message.reference.message_id == "reference to original message"
+        assert interaction.reply_to.content == "the original message"
+        assert interaction.mention == "John Doe"
+        assert interaction.values_map['seed'] == 1
+
+    @pytest.mark.asyncio
+    async def test_create_throws_exception_for_unsupported_emoji(self):
+        reaction = create_mock_object({
+            'emoji': {
+                'name': "anything"
+            }
+        })
+        reaction.__class__ = discord.RawReactionActionEvent
+        bot_mock = MagicMock()
+
+        with pytest.raises(Exception, match=f"Unsupported reaction: anything"):
+            await botutils.MyBotInteraction.create(bot_mock, reaction)
+
 
 class Test_is_valid_reaction():
     def test_is_valid_reaction(self):

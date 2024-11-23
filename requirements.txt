@@ -7,3 +7,4 @@ websockets
 nest_asyncio
 pytest
 pytest-cov
+pytest-asyncio

@@ -40,12 +40,6 @@ class ComfyUICommand():
             self.seed = random.getrandbits(64)
         else:
             self.seed = int(seed) #TODO: Error handling
-        if width is None:
-            width = 1024
-        if height is None:
-            height = 1024
-        if steps is None:
-            steps = 4
 
         self.width = width
         self.height = height
@@ -103,7 +97,7 @@ class MyBotInteraction():
             self.mention = data.ctx.interaction.user
             self.values_map = data.get_values_map()
         else:
-            raise Exception(f"Unsupported interaction data: {type(data)}")
+            raise Exception(f"Unsupported interaction data: {type(data).__name__}")
 
         return self
 
