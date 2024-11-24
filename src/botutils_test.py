@@ -187,6 +187,64 @@ class Test_MyBotInteraction():
         with pytest.raises(Exception, match=f"Unsupported reaction: anything"):
             await botutils.MyBotInteraction.create(bot_mock, reaction)
 
+    @pytest.mark.asyncio
+    async def test_get_prompt_returns_the_prompt_string(self, caplog):
+        caplog.set_level(logging.INFO)
+        ctx = create_mock_object({
+            'interaction': {
+                'user': 'foobar'
+            }
+        })
+        cmd = botutils.ComfyUICommand(
+            ctx,
+            'A simple prompt',
+        )
+        interaction = await botutils.MyBotInteraction.create(MagicMock(), cmd)
+        prompt = interaction.get_prompt()
+
+        assert caplog.records[0].levelname == "INFO"
+        assert caplog.records[0].message == "Getting workflow template and prompt"
+        assert "A simple prompt" == prompt["6"]["inputs"]["text"]
+
+    @pytest.mark.asyncio
+    @patch('random.getrandbits')
+    @patch('botutils.parse_message')
+    async def test_MyBotInteraction_string_representation(self, mock_parse_message, mock_getrandbits):
+        reaction = create_mock_object({
+            'channel_id': 1,
+            'message_id': 2,
+            'user_id': 3,
+            'emoji': {
+                'name': botutils.Reaction.REPEAT.value
+            }
+        })
+        reaction.__class__ = discord.RawReactionActionEvent
+
+        channel_mock = MagicMock()
+        channel_mock.fetch_message = AsyncMock(side_effect=[
+            create_mock_object({
+                'reference': {
+                    'message_id': 'reference to original message'
+                }
+            }),
+            create_mock_object({
+                'id': 8,
+                'content': 'the original message'
+            })
+        ])
+
+        bot_mock = MagicMock()
+        bot_mock.fetch_channel = AsyncMock(return_value=channel_mock)
+        bot_mock.fetch_user = AsyncMock(return_value="John Doe")
+
+        mock_parse_message.return_value = {'seed': 1}
+        mock_getrandbits.return_value = 4
+
+        interaction = await botutils.MyBotInteraction.create(bot_mock, reaction)
+        interaction_representation = f"{interaction}"
+
+        assert "MyBotInteraction(REPEAT, mention John Doe when replying to message 8)" in interaction_representation
+        assert "{'seed': 4}" in interaction_representation
 
 class Test_is_valid_reaction():
     def test_is_valid_reaction(self):
