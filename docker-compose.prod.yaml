@@ -5,3 +5,4 @@ services:
     network_mode: host
     environment:
       BOT_TYPE: PRODUCTION
+      VERSION: 0.1.0
