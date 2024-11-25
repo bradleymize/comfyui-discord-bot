@@ -2,14 +2,17 @@ import discord
 import logging
 import os
 
-import src.comfyui as my_comfyui
+import src.comfyutils as my_comfyui
 from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue, is_valid_reaction, Reaction
+from src.commandloader import load_commands
 
 log = logging.getLogger(__name__)
 
 
 class Command:
     def initialize(self, bot, websocket):
+
+        load_commands("src.commands", bot)
 
         def get_workflows(ctx: discord.commands.context.AutocompleteContext):
             package_dir = "src/workflows"
@@ -50,7 +53,7 @@ class Command:
             interaction = await MyBotInteraction.create(bot=bot, data=comfy_ui_command)
             interaction_queue.append(interaction)
 
-            log.info("Calling comfyui.generate")
+            log.info("Calling comfyutils.generate")
             await ctx.defer()
 
             prompt_id = await my_comfyui.generate(interaction)

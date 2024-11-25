@@ -12,7 +12,7 @@ import nest_asyncio
 from websockets.asyncio.client import connect
 
 from src.command import Command
-from src.comfyui import server_address, client_id
+from src.comfyutils import server_address, client_id
 import src.comfyuiwatcher as comfyui_watcher
 
 nest_asyncio.apply()

@@ -1,11 +1,15 @@
-#TODO: rename to comfyutils
+"""Module for interacting with a comfyui server
+
+
+
+"""
 
 import json
 import logging
 import aiohttp
 import uuid
 
-import src.botutils as botutils
+import src.botutils as botutils # TODO: Remove this
 from src.botutils import MyBotInteraction
 
 server_address = "127.0.0.1:8188"
@@ -13,6 +17,7 @@ client_id = str(uuid.uuid4())
 log = logging.getLogger(__name__)
 
 
+# TODO: Used by command.py 'comfyui' command. Update to use queue_new_prompt
 async def generate(
         interaction: MyBotInteraction
 ):
@@ -34,7 +39,7 @@ async def queue_new_prompt(interaction: MyBotInteraction):
     queue_response = await queue_prompt(prompt)
     interaction.prompt_id = queue_response['prompt_id']
     log.info(f"Got prompt id: {interaction.prompt_id}")
-    botutils.interaction_queue.append(interaction)
+    botutils.interaction_queue.append(interaction) # TODO: Move to where this method is being called
 
 async def queue_prompt(prompt):
     async with aiohttp.ClientSession() as session:
