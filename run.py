@@ -10,19 +10,25 @@ import sys
 import asyncio
 import nest_asyncio
 from websockets.asyncio.client import connect
+from src.commandloader import load_listeners, load_commands
 
-from src.command import Command
 from src.comfyutils import server_address, client_id
 import src.comfyuiwatcher as comfyui_watcher
 
 nest_asyncio.apply()
 
+def setup_logger():
+    logging.Formatter.formatTime = (lambda self, record, datefmt=None: datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc).astimezone().isoformat(sep="T",timespec="milliseconds"))
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)7s][%(name)15s]  %(message)s',
+        stream=sys.stdout
+    )
+
+setup_logger()
+log = logging.getLogger(__name__)
+
 async def main():
-    setup_logger()
-    log = logging.getLogger(__name__)
-
-    cmd = Command()
-
     log.info("Loading environment")
     dotenv.load_dotenv()
 
@@ -50,18 +56,17 @@ async def main():
         log.info("Starting long-term websocket watcher")
         asyncio.ensure_future(comfyui_watcher.listen_for_comfyui_messages(websocket))
 
-        cmd.initialize(bot, websocket)
+        load_listeners("src.listeners", bot)
+        load_commands("src.commands", bot)
+
         log.info("Starting bot")
         bot.run(token)
 
 
-def setup_logger():
-    logging.Formatter.formatTime = (lambda self, record, datefmt=None: datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc).astimezone().isoformat(sep="T",timespec="milliseconds"))
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s [%(levelname)7s][%(name)15s]  %(message)s',
-        stream=sys.stdout
-    )
-
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        log.info("Received exit, shutting down")
+    except RuntimeError:
+        log.info("Received runtime error, exiting")

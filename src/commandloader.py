@@ -24,3 +24,7 @@ def load_commands(package_root: str, bot: discord.Bot):
 
     for c in all_classes:
         c(bot).init()
+
+
+def load_listeners(package_root: str, bot: discord.Bot):
+    load_commands(package_root, bot)

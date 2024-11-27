@@ -1,4 +1,4 @@
-from src.commands.interface.MyCommand import MyCommand
+from src.interface.MyCommand import MyCommand
 import os
 import logging
 import discord
