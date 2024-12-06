@@ -25,18 +25,22 @@ class ComfyUICommand():
             self,
             ctx: discord.ApplicationContext,
             prompt: str,
-            workflow: str = "default.json.template",
+            negative_prompt: str,
+            model: str,
+            workflow: str,
             seed: str = None,
             width: int = 1024,
             height: int = 1024,
             steps: int = 4,
-            cfg: int = 1
+            cfg: float = 1.0
     ):
         self.ctx = ctx
         self.prompt = prompt.replace("\"", "\\\"") # Make prompt JSON friendly
+        self.negative_prompt = negative_prompt.replace("\"", "\\\"") # Make prompt JSON friendly
+        self.model = model
         self.workflow = workflow
 
-        if seed is None:
+        if seed is None or seed == '':
             self.seed = random.getrandbits(64)
         else:
             self.seed = int(seed) #TODO: Error handling
@@ -49,12 +53,14 @@ class ComfyUICommand():
     def get_values_map(self) -> dict:
         return {
             'workflow': self.workflow,
+            'model': self.model,
             'seed': self.seed,
             'width': self.width,
             'height': self.height,
             'steps': self.steps,
             'cfg': self.cfg,
-            'prompt': self.prompt
+            'prompt': self.prompt,
+            'negative_prompt': self.negative_prompt
         }
 
 class MyBotInteraction():
@@ -122,27 +128,67 @@ def parse_message(msg: str) -> Union[dict, None]:
     lines = msg.splitlines()
 
     if lines.pop(0).startswith("Queued an image"):
-        workflow = lines.pop(0).split(': ')[1]
-        seed = lines.pop(0).split(': ')[1]
-        width = lines.pop(0).split(': ')[1]
-        height = lines.pop(0).split(': ')[1]
-        steps = lines.pop(0).split(': ')[1]
-        prompt = lines.pop(0).split(': ')[1]
+        is_positive_prompt = False
+        is_negative_prompt = False
+
+        workflow = model = seed = width = height = steps = cfg = prompt = negative_prompt = None
 
         while not lines[0].startswith("prompt id:"):
-            prompt = "\n".join((prompt, lines.pop(0)))
+            line = lines.pop(0)
+            log.debug(f"Line: {line}")
+            parts = line.split(': ')
+            log.debug(f"    Parts: {parts}")
 
-        prompt_id = lines.pop(0) # Unused, prompt_id will be populated
+            if parts[0] == 'workflow':
+                workflow = parts[1]
+            elif parts[0] == 'model':
+                model = parts[1]
+            elif parts[0] == 'seed':
+                seed = parts[1]
+            elif parts[0] == 'width':
+                width = parts[1]
+            elif parts[0] == 'height':
+                height = parts[1]
+            elif parts[0] == 'steps':
+                steps = parts[1]
+            elif parts[0] == 'cfg':
+                cfg = parts[1]
+            elif parts[0] == 'prompt' and not is_positive_prompt:
+                log.debug("        INSIDE THE POSITIVE PROMPT SECTION")
+                is_positive_prompt = True
+                is_negative_prompt = False
+                prompt = parts[1]
+            elif parts[0] == 'negative prompt' and not is_negative_prompt:
+                log.debug("        INSIDE THE NEGATIVE PROMPT SECTION")
+                is_negative_prompt = True
+                is_positive_prompt = False
+                negative_prompt = parts[1]
+            elif is_positive_prompt:
+                log.debug("        INSIDE THE POSITIVE PROMPT SECTION")
+                prompt = "\n".join((prompt, line))
+            elif is_negative_prompt:
+                log.debug("        INSIDE THE NEGATIVE PROMPT SECTION")
+                negative_prompt = "\n".join((negative_prompt, line))
+            elif parts[0] == 'prompt id':
+                pass
 
-        return {
+        reconstructed_value_map = {
             'workflow': workflow,
+            'model': model,
             'seed': seed,
             'width': width,
             'height': height,
             'steps': steps,
-            'cfg': 1,
-            'prompt': prompt
+            'cfg': cfg,
+            'prompt': prompt,
+            'negative_prompt': negative_prompt
         }
+
+        log.debug("------------------------------------------------------------")
+        log.debug(reconstructed_value_map)
+        log.debug("------------------------------------------------------------")
+
+        return reconstructed_value_map
     else:
         log.warning("Message is not parseable")
         return None

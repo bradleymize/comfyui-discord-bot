@@ -2,13 +2,13 @@
   "3": {
     "inputs": {
       "seed": ${seed},
-      "steps": 8,
-      "cfg": 2,
-      "sampler_name": "dpmpp_sde",
-      "scheduler": "karras",
+      "steps": ${steps},
+      "cfg": ${cfg},
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "sgm_uniform",
       "denoise": 1,
       "model": [
-        "4",
+        "10",
         0
       ],
       "positive": [
@@ -29,15 +29,6 @@
       "title": "KSampler"
     }
   },
-  "4": {
-    "inputs": {
-      "ckpt_name": "dreamshaperXL_v21TurboDPMSDE.safetensors"
-    },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Load Checkpoint"
-    }
-  },
   "5": {
     "inputs": {
       "width": ${width},
@@ -53,8 +44,8 @@
     "inputs": {
       "text": "${prompt}",
       "clip": [
-        "4",
-        1
+        "11",
+        0
       ]
     },
     "class_type": "CLIPTextEncode",
@@ -64,10 +55,10 @@
   },
   "7": {
     "inputs": {
-      "text": "(low quality, worst quality:1.4), cgi, text, signature, watermark, extra limbs, ((nipples))",
+      "text": "",
       "clip": [
-        "4",
-        1
+        "11",
+        0
       ]
     },
     "class_type": "CLIPTextEncode",
@@ -82,8 +73,8 @@
         0
       ],
       "vae": [
-        "4",
-        2
+        "12",
+        0
       ]
     },
     "class_type": "VAEDecode",
@@ -91,13 +82,43 @@
       "title": "VAE Decode"
     }
   },
-  "save_image_websocket_node": {
-      "class_type": "SaveImageWebsocket",
-      "inputs": {
-        "images": [
-          "8",
-          0
-        ]
-      }
+  "10": {
+    "inputs": {
+      "unet_name": "${model}",
+      "weight_dtype": "fp8_e4m3fn"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "Load Diffusion Model"
     }
+  },
+  "11": {
+    "inputs": {
+      "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "clip_l.safetensors",
+      "type": "flux"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "DualCLIPLoader"
+    }
+  },
+  "12": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "save_image_websocket_node": {
+    "class_type": "SaveImageWebsocket",
+    "inputs": {
+      "images": [
+        "8",
+        0
+      ]
+    }
+  }
 }

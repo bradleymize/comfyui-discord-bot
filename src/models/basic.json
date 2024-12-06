@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Boleromix(SDXL) v1.3",
+    "value": "boleromixSDXL_v13.safetensors",
+    "nsfw": true
+  },
+  {
+    "name": "DreamShaper XL Turbo v2.1",
+    "value": "dreamshaperXL_v21TurboDPMSDE.safetensors",
+    "nsfw": true
+  },
+  {
+    "name": "Pony Diffusion XL v6",
+    "value": "ponyDiffusionV6XL_v6StartWithThisOne.safetensors",
+    "nsfw": true
+  },
+  {
+    "name": "ReV Animated Rebirth v2",
+    "value": "revAnimated_v2Rebirth.safetensors",
+    "nsfw": true
+  }
+]

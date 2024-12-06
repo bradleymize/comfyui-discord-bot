@@ -1,5 +1,5 @@
 from src.interface.MyCommand import MyCommand
-import os
+import json
 import logging
 import discord
 from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue
@@ -7,15 +7,15 @@ from src.comfyutils import queue_new_prompt, get_queue_information
 
 log = logging.getLogger(__name__)
 
-class ComfyUI(MyCommand):
+class Flux(MyCommand):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
 
 
     def init(self):
         self.cmd_meta = {
-            'name': 'comfyui',
-            'description': 'Creates an AI image using ComfyUI'
+            'name': 'flux',
+            'description': 'Creates an AI image using ComfyUI (using the flux workflow)'
         }
         self.options = [
             {
@@ -25,12 +25,11 @@ class ComfyUI(MyCommand):
                 'description': "Describe the image you wish to create"
             },
             {
-                'name': 'workflow',
+                'name': 'model',
                 'type': discord.SlashCommandOptionType.string,
                 'required': True,
-                'description': "The workflow to use for generating the image",
-                'default': "default.json.template",
-                'autocomplete': discord.utils.basic_autocomplete(self.get_workflows)
+                'description': "The model to use",
+                'autocomplete': discord.utils.basic_autocomplete(self.get_models)
             },
             {
                 'name': 'seed',
@@ -59,38 +58,51 @@ class ComfyUI(MyCommand):
                 'required': False,
                 'default': 4,
                 'description': "The number of iterations to perform when generating the image. Default: 4"
+            },
+            {
+                'name': 'cfg',
+                'type': discord.SlashCommandOptionType.number,
+                'required': False,
+                'default': 1.0,
+                'description': "The guidance scale (how closely to follow the prompt). Default: 1.0"
             }
         ]
         self.fn = self.command
         super().register_command()
 
 
-    def get_workflows(self, ctx: discord.commands.context.AutocompleteContext):
-        package_dir = "src/workflows"
-        files = os.listdir(package_dir)
-        return files
+    def get_models(self, ctx: discord.commands.context.AutocompleteContext):
+        models = []
+        with open('src/models/flux.json') as f:
+            workflow_model_information = json.load(f)
+            for model in workflow_model_information:
+                models.append(discord.OptionChoice(model['name'], model['value']))
+        return models
 
 
     async def command(
             self,
             ctx: discord.ApplicationContext,
             prompt: str,
-            workflow: str = "default.json.template",
+            model: str,
             seed: str = None,
             width: int = 1024,
             height: int = 1024,
-            steps: int = 4
+            steps: int = 4,
+            cfg: float = 1.0
     ):
         log.info("Creating new ComfyUICommand object")
         comfy_ui_command = ComfyUICommand(
             ctx=ctx,
-            workflow=workflow,
+            workflow="flux.json.template",
             prompt=prompt,
+            negative_prompt='',
+            model=model,
             seed=seed,
             width=width,
             height=height,
             steps=steps,
-            cfg=1
+            cfg=cfg
         )
         values_map = comfy_ui_command.get_values_map()
 
@@ -104,10 +116,12 @@ class ComfyUI(MyCommand):
         queue_status = await get_queue_information()
         msg = f"""Queued an image with the following config:
 workflow: {values_map['workflow']}
+model: {values_map['model']}
 seed: {values_map['seed']}
 width: {values_map['width']}
 height: {values_map['height']}
 steps: {values_map['steps']}
+cfg: {values_map['cfg']}
 prompt: {values_map['prompt']}
 prompt id: {interaction.prompt_id}
 {queue_status}"""
