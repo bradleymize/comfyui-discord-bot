@@ -1,7 +1,7 @@
 from src.interface.MyCommand import MyCommand
 import logging
 import discord
-import importlib.resources
+import json
 
 log = logging.getLogger(__name__)
 
@@ -29,12 +29,13 @@ class ModelInfo(MyCommand):
 
 
     def get_models(self, ctx: discord.commands.context.AutocompleteContext):
+        # Construct from: https://embed.dan.onl/
         models = [
-            discord.OptionChoice("Boleromix(SDXL) v1.3", "boleromixSDXL_v13.safetensors.md"),
-            discord.OptionChoice("DreamShaper XL Turbo v2.1", "dreamshaperXL_v21TurboDPMSDE.safetensors.md"),
-            discord.OptionChoice("PixelWave FLUX Schnell v3", "pixelwave_flux1Schnell03.safetensors.md"),
-            discord.OptionChoice("Pony Diffusion XL v6", "ponyDiffusionV6XL_v6StartWithThisOne.safetensors.md"),
-            discord.OptionChoice("ReV Animated Rebirth v2", "revAnimated_v2Rebirth.safetensors.md")
+            discord.OptionChoice("Boleromix(SDXL) v1.3", "boleromixSDXL_v13.safetensors.json"),
+            discord.OptionChoice("DreamShaper XL Turbo v2.1", "dreamshaperXL_v21TurboDPMSDE.safetensors.json"),
+            discord.OptionChoice("PixelWave FLUX Schnell v3", "pixelwave_flux1Schnell03.safetensors.json"),
+            discord.OptionChoice("Pony Diffusion XL v6", "ponyDiffusionV6XL_v6StartWithThisOne.safetensors.json"),
+            discord.OptionChoice("ReV Animated Rebirth v2", "revAnimated_v2Rebirth.safetensors.json")
         ]
         return models
 
@@ -45,7 +46,23 @@ class ModelInfo(MyCommand):
             model: str
     ):
         log.info(f"Getting information about {model}")
-        model_info = importlib.resources.read_text("src.models.info", model)
-        # TODO: Provide sample images in response
+        embeds = []
+        with open(f'src/models/info/{model}') as f:
+            model_embeds_info = json.load(f)
+
+            for embed_info in model_embeds_info:
+                fields = None
+                if "fields" in embed_info:
+                    fields = embed_info['fields']
+                    del embed_info['fields']
+                if "color" in embed_info:
+                    embed_info['color'] = int(embed_info['color'], 16)
+
+                embed = discord.Embed(**embed_info)
+                if fields is not None:
+                    for field in fields:
+                        embed.add_field(**field)
+                embeds.append(embed)
+
         log.info("Sending response")
-        await ctx.send_response(model_info, ephemeral=True)
+        await ctx.send_response(embeds=embeds, ephemeral=True)

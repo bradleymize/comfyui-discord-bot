@@ -1,0 +1,36 @@
+[
+  {
+    "title": "Pony Diffusion XL v6",
+    "url": "https://civitai.com/models/257749?modelVersionId=290640",
+    "image": "https://b-rad.dev/images/ai/ponydiffusion-xl-v6/sample-01.png",
+    "color": "0x3498db",
+    "description": "1\n```\n/basic prompt: score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, anthro mouse gadget hackwrench, blonde hair model: ponyDiffusionV6XL_v6StartWithThisOne.safetensors seed: 1029115117 width: 869 height: 1152 steps: 30 cfg: 8.5\n```\nRecommended defaults",
+    "fields": [
+      {
+        "name": "Width",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Height",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Steps",
+        "value": "25",
+        "inline": true
+      },
+      {
+        "name": "CFG",
+        "value": "8.0",
+        "inline": true
+      },
+      {
+        "name": "Is NSFW",
+        "value": "Yes",
+        "inline": true
+      }
+    ]
+  }
+]

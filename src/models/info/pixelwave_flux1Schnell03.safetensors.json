@@ -1,0 +1,44 @@
+[
+  {
+    "title": "PixelWave FLUX Schnell v3",
+    "url": "https://civitai.com/models/141592?modelVersionId=1002647",
+    "image": "https://b-rad.dev/images/ai/pixelwave-flux1-schnell-3/sample-01.png",
+    "color": "0x3498db",
+    "description": "1\n```\n/flux prompt: title at the top that says \"Yes, I am judging you\". stern looking ginger cat with blue eyes. green kitchen background. dismissive expression model: pixelwave_flux1Schnell03.safetensors seed: 150 width: 896 height: 1536 steps: 4 cfg: 1\n```\n2\n```\n/flux prompt: incredible dynamic range photography of a cinematic scene, teenage engineering style robotic armor with cybernetic enhancements, helmet with a build-in illuminated LCD display visor, tactical armor plating, Turquoise Blue and Maroon Red and Gold Yellow, matte rubber details, painted aluminium, shot on blackmagic URSA Cine 12k, Cinematic Large Format Sensor, Optical Low Pass Filter model: pixelwave_flux1Schnell03.safetensors width: 832 height: 1216 steps: 8 cfg: 1\n```\n3\n```\n/flux prompt: Artistic image of a silhouette of a couple from behind sitting in an open meadow next to each other at sunset. The sky painted with a rainbow gradient, orange and red hues near the horizon, stretching up to indigo and twilight higher up in the sky. There are sparse lights from fireflies near the flowers and grass on the ground, with the silhouette of a small forest to the left and right of the frame. The atmosphere is warm and cozy. model: pixelwave_flux1Schnell03.safetensors seed: 724694216058736 width: 960 height: 544 steps: 4 cfg: 1\n```\nRecommended defaults (also good with 512x768 and 768x512)",
+    "fields": [
+      {
+        "name": "Width",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Height",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Steps",
+        "value": "4-8",
+        "inline": true
+      },
+      {
+        "name": "CFG",
+        "value": "3.5",
+        "inline": true
+      },
+      {
+        "name": "Is NSFW",
+        "value": "No",
+        "inline": true
+      }
+    ]
+  },
+  {
+    "url": "https://civitai.com/models/141592?modelVersionId=1002647",
+    "image": "https://b-rad.dev/images/ai/pixelwave-flux1-schnell-3/sample-02.png"
+  },
+  {
+    "url": "https://civitai.com/models/141592?modelVersionId=1002647",
+    "image": "https://b-rad.dev/images/ai/pixelwave-flux1-schnell-3/sample-03.png"
+  }
+]

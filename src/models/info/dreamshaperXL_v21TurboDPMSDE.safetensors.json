@@ -1,0 +1,53 @@
+[
+  {
+    "title": "DreamShaper XL Turbo v2.1",
+    "url": "https://civitai.com/models/112902?modelVersionId=351306",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-xl-turbo-v2-1/sample-01.png",
+    "color": "0x3498db",
+    "description": "1\n```\n/basic prompt: In Casey Baugh's evocative style, art of a beautiful young girl cyborg with long brown hair, futuristic, scifi, intricate, elegant, highly detailed, majestic, Baugh's brushwork infuses the painting with a unique combination of realism and abstraction, greg rutkowski, surreal gold filigree, broken glass, (masterpiece, sidelighting, finely detailed beautiful eyes: 1.2), hdr, realistic painting, natural skin, textured skin, closed mouth, crystal eyes, butterfly filigree, chest armor, eye makeup, robot joints, long hair moved by the wind, window facing to another world, Baugh's distinctive style captures the essence of the girl's enigmatic nature, inviting viewers to explore the depths of her soul, award winning art <lora:aesthetic_anime_v1s:1> model: dreamshaperXL_v21TurboDPMSDE.safetensors negative_prompt: ugly, deformed, noisy, blurry, low contrast, text, 3d, cgi, render, anime, open mouth, big forehead, long neck width: 612 height: 972 steps: 8 cfg: 2\n```\n2\n```\n/basic prompt: photo of the warrior Aragorn from Lord of the Rings, film grain, cinematic film still, 8k hd, portrait model: dreamshaperXL_v21TurboDPMSDE.safetensors negative_prompt: (deformed iris, deformed pupils), text, worst quality, low quality, ugly, width: 1152 height: 1536 steps: 8 cfg: 2\n```\n3\n```\n/basic prompt: masterpiece, best quality, cinematic film still, realistic, portrait, solo, white mecha robot, cape, science fiction, torn clothes, glowing, standing, robot joints, mecha, armor, cowboy shot, (floating cape), intense sunlight, silver dragonborn, outdoors, landscape, nature highres, 4k, 8k, intricate detail, cinematic lighting, amazing quality, wallpaper <lora:aesthetic_anime_v1s:1.1> model: dreamshaperXL_v21TurboDPMSDE.safetensors negative_prompt: nipples, (low quality, worst quality:1.4), cgi, text, signature, watermark, extra limbs width: 1072 height: 1432 steps: 8 cfg: 2\n```\n4\n```\n/basic prompt: photo of a Cat poised gracefully atop an ancient oak tree, autumn leaves fluttering around, golden hour casting long shadows, backlit, sharp focus on feline, bokeh effect on background foliage, cinematic film still, model: dreamshaperXL_v21TurboDPMSDE.safetensors negative_prompt: ugly, deformed, noisy, blurry, low contrast width: 652 height: 868 steps: 5 cfg: 2\n```\nRecommended defaults",
+    "fields": [
+      {
+        "name": "Width",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Height",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Steps",
+        "value": "4",
+        "inline": true
+      },
+      {
+        "name": "CFG",
+        "value": "2.0",
+        "inline": true
+      },
+      {
+        "name": "Sampler",
+        "value": "DPM++ SDE Karras",
+        "inline": true
+      },
+      {
+        "name": "Is NSFW",
+        "value": "Yes",
+        "inline": true
+      }
+    ]
+  },
+  {
+    "url": "https://civitai.com/models/112902?modelVersionId=351306",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-xl-turbo-v2-1/sample-02.png"
+  },
+  {
+    "url": "https://civitai.com/models/112902?modelVersionId=351306",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-xl-turbo-v2-1/sample-03.png"
+  },
+  {
+    "url": "https://civitai.com/models/112902?modelVersionId=351306",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-xl-turbo-v2-1/sample-04.png"
+  }
+]
