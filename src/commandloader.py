@@ -1,6 +1,8 @@
 import importlib
 import inspect
 import discord
+import src.interface.MyCommand
+
 
 def load_commands(package_root: str, bot: discord.Bot):
     all_classes = []
@@ -18,7 +20,7 @@ def load_commands(package_root: str, bot: discord.Bot):
         package = importlib.import_module(module_name)
         contents = inspect.getmembers(package, lambda x: not inspect.isroutine(x))
         # Get all the classes belonging directly to the module
-        classes = [c[1] for c in contents if inspect.isclass(c[1]) and c[1].__module__ == module_name]
+        classes = [c[1] for c in contents if inspect.isclass(c[1]) and c[1].__module__ == module_name and src.interface.MyCommand.MyCommand in c[1].__bases__]
         # Add the classes to the list of all the classes in the module
         all_classes = all_classes + classes
 
