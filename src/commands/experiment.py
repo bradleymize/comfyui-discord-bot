@@ -1,6 +1,10 @@
 from src.interface.MyCommand import MyCommand
 import logging
 import discord
+import json
+from src.database import insert_prompt, get_prompt_information_for_message_id, delete_prompt_information_for_message_id, \
+    update_prompt_id_for_message_id
+import time  # TODO: Remove
 
 log = logging.getLogger(__name__)
 
@@ -9,6 +13,7 @@ class MyView(discord.ui.View):
         super().__init__(timeout=None)
         self.prompt_info = prompt_info
 
+
     @discord.ui.button(
         style=discord.ButtonStyle.primary,
         custom_id="image:regenerate",
@@ -16,6 +21,11 @@ class MyView(discord.ui.View):
         label="Regenerate"
     )
     async def regenerate_callback(self, button, interaction):
+        update_prompt_id_for_message_id(interaction.message.id, "random-prompt-id-here")
+
+        await interaction.response.send_message("Working on new generation...")
+        response_message = await interaction.original_response()
+
         new_embed = interaction.message.embeds[0]
         new_embed.image = "https://b-rad.dev/images/ai/revanimated-rebirth-v2/sample-02.png"
 
@@ -24,7 +34,15 @@ class MyView(discord.ui.View):
             new_prompt_info[key] = value
         new_prompt_info['seed'] = 987654321
 
-        await interaction.response.send_message(embeds=[new_embed], view=MyView(new_prompt_info))
+        interaction_dict = interaction.to_dict()
+        command_name = interaction_dict['message']['interaction_metadata']['name']
+
+        insert_prompt(response_message.id, command_name, new_prompt_info)  # TODO: Put this in the command that initially generates the image
+
+        time.sleep(5)  # TODO: Remove artificial wait
+
+        await interaction.edit_original_response(content=f"{interaction.user.mention}", embeds=[new_embed], view=MyView(new_prompt_info))
+
 
     @discord.ui.button(
         style=discord.ButtonStyle.secondary,
@@ -32,11 +50,19 @@ class MyView(discord.ui.View):
         label="Get Prompt"
     )
     async def print_prompt(self, button, interaction):
-        msg = "```\n/basic "
-        for key, value in self.prompt_info.items():
-            msg += f"{key}: {value} "
-        msg += "\n```"
+        prompt_info = get_prompt_information_for_message_id(interaction.message.id)
+
+        if prompt_info is None:
+            msg = "Unable to retrieve prompt information for the image"
+        else:
+            prompt_values = json.loads(prompt_info.prompt_values)
+            msg = f"```\n/{prompt_info.command_name} "
+            for key, value in prompt_values.items():
+                msg += f"{key}: {value} "
+            msg += "\n```"
+
         await interaction.response.send_message(msg, ephemeral=True)
+
 
     @discord.ui.button(
         style=discord.ButtonStyle.danger,
@@ -44,6 +70,7 @@ class MyView(discord.ui.View):
         label="Delete"
     )
     async def delete_message(self, button, interaction):
+        delete_prompt_information_for_message_id(interaction.message.id)
         await interaction.message.delete()
 
 
@@ -84,4 +111,6 @@ class Experiment(MyCommand):
         }
         log.info("Sending response")
 
-        await ctx.send_response(embeds=[embed], view=MyView(prompt_info))
+        interaction = await ctx.send_response(embeds=[embed], view=MyView(prompt_info))
+        response_message = await interaction.original_response()
+        insert_prompt(response_message.id, self.cmd_meta['name'], prompt_info)

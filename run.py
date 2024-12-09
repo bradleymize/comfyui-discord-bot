@@ -11,6 +11,7 @@ import asyncio
 import nest_asyncio
 from websockets.asyncio.client import connect
 from src.commandloader import load_listeners, load_commands
+from src.database import initialize_database
 
 from src.comfyutils import server_address, client_id
 import src.comfyuiwatcher as comfyui_watcher
@@ -31,6 +32,9 @@ log = logging.getLogger(__name__)
 async def main():
     log.info("Loading environment")
     dotenv.load_dotenv()
+
+    log.info("Initializing database")
+    initialize_database()
 
     bot_type = os.getenv("BOT_TYPE")
     if bot_type is None:
