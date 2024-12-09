@@ -53,6 +53,7 @@ async def main():
     @bot.event
     async def on_ready():
         log.info(f"{bot.user} is ready and online!")
+        comfyui_watcher.bot = bot
         await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f"version: {os.getenv('VERSION')}"))
 
     log.info("connecting to websocket")

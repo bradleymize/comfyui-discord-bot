@@ -3,9 +3,14 @@ import io
 import discord
 import json
 import src.botutils as botutils
+from src.commands.experiment import MyView
+from src.database import get_information_prompt_id
 
 log = logging.getLogger(__name__)
 # TODO: Error handling
+
+bot = None
+
 async def listen_for_comfyui_messages(ws):
     log.info("Beginning to listen for websocket messages")
     current_node = ""
@@ -28,7 +33,7 @@ async def listen_for_comfyui_messages(ws):
             if current_node == 'save_image_websocket_node':
                 prompt_id = current_node_data['prompt_id']
                 log.info(f"Done processing prompt id: {prompt_id}")
-                await send_images(prompt_id, out[8:])
+                await respond_with_image(prompt_id, out[8:])
                 current_node = ""
                 current_node_data = None
 
@@ -53,3 +58,29 @@ async def send_images(prompt_id, image_bytes):
     await reply_msg.add_reaction(botutils.Reaction.REPEAT.value)
     await reply_msg.add_reaction(botutils.Reaction.DELETE.value)
     botutils.remove_interaction(interaction)
+
+
+async def respond_with_image(prompt_id, image_bytes):
+    if bot is None:
+        log.error(f"Cannot fetch message to respond to, bot instance is null")
+        return
+
+    prompt_info = get_information_prompt_id(prompt_id)
+    log.info(f"prompt_info: {prompt_info}")
+
+    log.info("Fetching channel")
+    channel = await bot.fetch_channel(prompt_info.channel_id)
+    log.info("Fetching message")
+    message = await channel.fetch_message(prompt_info.discord_message_id)
+
+    b = io.BytesIO(image_bytes)  # Discord requires io.BufferedIOBase, BytesIO inherits from BufferedIOBase
+    images = []
+    images.append(discord.File(b, 'image.png'))
+
+    embed = discord.Embed(
+        color=int("0x3498db", 16),
+        image="attachment://image.png"
+    )
+
+    log.info(f"Editing message {message.id} with image + view")
+    await message.edit(content=f"{prompt_info.mention_user}", embeds=[embed], files=images, view=MyView())

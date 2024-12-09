@@ -43,4 +43,4 @@ class RestartBot(MyCommand):
         }
         log.info("Sending response")
 
-        await ctx.send_response(embeds=[embed], view=MyView(prompt_info), ephemeral=True)
+        await ctx.send_response(embeds=[embed], view=MyView(), ephemeral=True)
