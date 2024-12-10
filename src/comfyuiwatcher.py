@@ -3,7 +3,7 @@ import io
 import discord
 import json
 import src.botutils as botutils
-from src.commands.experiment import MyView
+from src.views.ImageResponseView import ImageResponseView
 from src.database import get_information_prompt_id
 
 log = logging.getLogger(__name__)
@@ -83,4 +83,4 @@ async def respond_with_image(prompt_id, image_bytes):
     )
 
     log.info(f"Editing message {message.id} with image + view")
-    await message.edit(content=f"{prompt_info.mention_user}", embeds=[embed], files=images, view=MyView())
+    await message.edit(content=f"{prompt_info.mention_user}", embeds=[embed], files=images, view=ImageResponseView())
