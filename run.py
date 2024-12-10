@@ -1,5 +1,4 @@
 # https://discord.com/oauth2/authorize?client_id=1304485175660515408&permissions=277025703936&integration_type=0&scope=bot
-from code import interact
 
 import discord
 import dotenv
@@ -10,7 +9,7 @@ import sys
 import asyncio
 import nest_asyncio
 from websockets.asyncio.client import connect
-from src.commandloader import load_listeners, load_commands
+from src.commandloader import load_commands
 from src.database import initialize_database
 
 from src.comfyutils import server_address, client_id
@@ -61,7 +60,7 @@ async def main():
         log.info("Starting long-term websocket watcher")
         asyncio.ensure_future(comfyui_watcher.listen_for_comfyui_messages(websocket))
 
-        load_listeners("src.listeners", bot)
+        # load_listeners("src.listeners", bot)
         load_commands("src.commands", bot)
 
         log.info("Starting bot")

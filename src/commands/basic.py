@@ -1,9 +1,11 @@
-from src.interface.MyCommand import MyCommand
+import json
 import logging
 import discord
-import json
-from src.botutils import ComfyUICommand, MyBotInteraction, interaction_queue
-from src.comfyutils import queue_new_prompt, get_queue_information
+
+from src.interface.MyCommand import MyCommand
+from src.botutils import ComfyUICommand, MyBotInteraction
+from src.comfyutils import queue_prompt
+from src.database import insert_prompt, update_prompt_id_for_message_id
 
 log = logging.getLogger(__name__)
 
@@ -99,6 +101,8 @@ class Basic(MyCommand):
             steps: int = 4,
             cfg: float = 2.0
     ):
+        log.info("Running basic command")
+
         log.info("Creating new ComfyUICommand object")
         comfy_ui_command = ComfyUICommand(
             ctx=ctx,
@@ -114,26 +118,35 @@ class Basic(MyCommand):
         )
         values_map = comfy_ui_command.get_values_map()
 
+        await ctx.response.send_message(f"Queueing new image, {ctx.user.mention}")
+        response_message = await ctx.interaction.original_response()
+        insert_prompt(response_message.id, response_message.channel.id, ctx.user.mention, self.cmd_meta['name'], values_map)
+
         interaction = await MyBotInteraction.create(bot=self.bot, data=comfy_ui_command)
 
-        log.info("Calling comfyutils.queue_new_prompt")
-        await ctx.defer()
-        await queue_new_prompt(interaction)
-        interaction_queue.append(interaction)
+        queue_response = await queue_prompt(interaction.get_prompt())
+        prompt_id = queue_response['prompt_id']
+        update_prompt_id_for_message_id(response_message.id, prompt_id)
+        log.info("done with basic command")
 
-        queue_status = await get_queue_information()
-        msg = f"""Queued an image with the following config:
-workflow: {values_map['workflow']}
-model: {values_map['model']}
-seed: {values_map['seed']}
-width: {values_map['width']}
-height: {values_map['height']}
-steps: {values_map['steps']}
-cfg: {values_map['cfg']}
-prompt: {values_map['prompt']}
-negative prompt: {values_map['negative_prompt']}
-prompt id: {interaction.prompt_id}
-{queue_status}"""
-
-        response = await ctx.followup.send(msg)
-        interaction.reply_to = response
+#         log.info("Calling comfyutils.queue_new_prompt")
+#         await ctx.defer()
+#         await queue_new_prompt(interaction)
+#         interaction_queue.append(interaction)
+#
+#         queue_status = await get_queue_information()
+#         msg = f"""Queued an image with the following config:
+# workflow: {values_map['workflow']}
+# model: {values_map['model']}
+# seed: {values_map['seed']}
+# width: {values_map['width']}
+# height: {values_map['height']}
+# steps: {values_map['steps']}
+# cfg: {values_map['cfg']}
+# prompt: {values_map['prompt']}
+# negative prompt: {values_map['negative_prompt']}
+# prompt id: {interaction.prompt_id}
+# {queue_status}"""
+#
+#         response = await ctx.followup.send(msg)
+#         interaction.reply_to = response
