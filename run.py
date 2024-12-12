@@ -1,5 +1,4 @@
 # https://discord.com/oauth2/authorize?client_id=1304485175660515408&permissions=277025703936&integration_type=0&scope=bot
-
 import discord
 import dotenv
 import os
@@ -8,6 +7,7 @@ import datetime
 import sys
 import asyncio
 import nest_asyncio
+from src.logger import LastNLinesHandler
 from websockets.asyncio.client import connect
 from src.commandloader import load_commands
 from src.database import initialize_database
@@ -18,12 +18,19 @@ import src.comfyuiwatcher as comfyui_watcher
 nest_asyncio.apply()
 
 def setup_logger():
+    format_string = '%(asctime)s [%(levelname)7s][%(name)15s]  %(message)s'
     logging.Formatter.formatTime = (lambda self, record, datefmt=None: datetime.datetime.fromtimestamp(record.created, datetime.timezone.utc).astimezone().isoformat(sep="T",timespec="milliseconds"))
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s [%(levelname)7s][%(name)15s]  %(message)s',
+        format=format_string,
         stream=sys.stdout
     )
+    root_logger = logging.getLogger()
+    custom_formatter = logging.Formatter(fmt=format_string)
+    handler = LastNLinesHandler()
+    handler.setFormatter(custom_formatter)
+    root_logger.addHandler(handler)
+
 
 setup_logger()
 log = logging.getLogger(__name__)

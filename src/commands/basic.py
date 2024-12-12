@@ -128,25 +128,3 @@ class Basic(MyCommand):
         prompt_id = queue_response['prompt_id']
         update_prompt_id_for_message_id(response_message.id, prompt_id)
         log.info("done with basic command")
-
-#         log.info("Calling comfyutils.queue_new_prompt")
-#         await ctx.defer()
-#         await queue_new_prompt(interaction)
-#         interaction_queue.append(interaction)
-#
-#         queue_status = await get_queue_information()
-#         msg = f"""Queued an image with the following config:
-# workflow: {values_map['workflow']}
-# model: {values_map['model']}
-# seed: {values_map['seed']}
-# width: {values_map['width']}
-# height: {values_map['height']}
-# steps: {values_map['steps']}
-# cfg: {values_map['cfg']}
-# prompt: {values_map['prompt']}
-# negative prompt: {values_map['negative_prompt']}
-# prompt id: {interaction.prompt_id}
-# {queue_status}"""
-#
-#         response = await ctx.followup.send(msg)
-#         interaction.reply_to = response
