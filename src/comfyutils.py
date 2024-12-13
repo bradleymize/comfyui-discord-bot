@@ -41,6 +41,7 @@ async def get_queue_information() -> str:
                     is_running = "yes"
                 return f"Current queue size: {len(js['queue_pending'])}. Currently generating an image: {is_running}"
 
+# TODO: Consider hard-coding samplers for faster response, with potential toggle flag (in code) to dynamically get
 async def get_sampler_names(*args, **kwargs) -> List[str]:
     async with aiohttp.ClientSession() as session:
         async with session.get("http://{}/object_info/KSampler".format(server_address)) as r:
@@ -48,6 +49,7 @@ async def get_sampler_names(*args, **kwargs) -> List[str]:
                 js = await r.json()
                 return js['KSampler']['input']['required']['sampler_name'][0]
 
+# TODO: Consider hard-coding schedulers for faster response, with potential toggle flag (in code) to dynamically get
 async def get_schedulers(*args, **kwargs) -> List[str]:
     async with aiohttp.ClientSession() as session:
         async with session.get("http://{}/object_info/KSampler".format(server_address)) as r:

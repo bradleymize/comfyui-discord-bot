@@ -19,7 +19,7 @@ class InteractionType(Enum):
     REPEAT = 2
     DELETE = 3
 
-# TODO: Defaults for given workflow (width / height / steps / cfg scale)
+
 class ComfyUICommand():
     def __init__(
             self,
