@@ -5,7 +5,9 @@ import json
 import logging
 import aiohttp
 import uuid
+from typing import List
 
+# API documentation: https://github.com/comfyanonymous/ComfyUI/blob/master/server.py
 
 server_address = "127.0.0.1:8188"
 client_id = str(uuid.uuid4())
@@ -38,3 +40,17 @@ async def get_queue_information() -> str:
                 if len(js['queue_running']) > 0:
                     is_running = "yes"
                 return f"Current queue size: {len(js['queue_pending'])}. Currently generating an image: {is_running}"
+
+async def get_sampler_names(*args, **kwargs) -> List[str]:
+    async with aiohttp.ClientSession() as session:
+        async with session.get("http://{}/object_info/KSampler".format(server_address)) as r:
+            if r.status == 200:
+                js = await r.json()
+                return js['KSampler']['input']['required']['sampler_name'][0]
+
+async def get_schedulers(*args, **kwargs) -> List[str]:
+    async with aiohttp.ClientSession() as session:
+        async with session.get("http://{}/object_info/KSampler".format(server_address)) as r:
+            if r.status == 200:
+                js = await r.json()
+                return js['KSampler']['input']['required']['scheduler'][0]

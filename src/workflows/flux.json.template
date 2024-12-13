@@ -4,8 +4,8 @@
       "seed": ${seed},
       "steps": ${steps},
       "cfg": ${cfg},
-      "sampler_name": "dpmpp_2m",
-      "scheduler": "sgm_uniform",
+      "sampler_name": "${sampler}",
+      "scheduler": "${scheduler}",
       "denoise": 1,
       "model": [
         "10",

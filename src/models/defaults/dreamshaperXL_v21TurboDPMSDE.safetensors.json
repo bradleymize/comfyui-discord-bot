@@ -2,5 +2,7 @@
   "width": 1024,
   "height": 1024,
   "cfg": 2.0,
-  "steps": 4
+  "steps": 4,
+  "sampler": "dpmpp_sde",
+  "scheduler": "karras"
 }

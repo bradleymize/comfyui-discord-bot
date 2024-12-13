@@ -1,6 +1,8 @@
 {
   "width": 1024,
   "height": 1024,
-  "cfg": 8.0,
-  "steps": 25
+  "cfg": 8.5,
+  "steps": 25,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal"
 }

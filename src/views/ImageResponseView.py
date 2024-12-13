@@ -2,7 +2,7 @@ import json
 from collections import namedtuple
 import discord
 
-from src.botutils import ComfyUICommand, MyBotInteraction
+from src.botutils import ComfyUICommand
 from src.comfyutils import queue_prompt
 from src.commands.experiment import log
 from src.database import get_prompt_information_for_message_id, insert_prompt, update_prompt_id_for_message_id, \
@@ -44,9 +44,9 @@ class ImageResponseView(discord.ui.View):
         values_map = comfy_ui_command.get_values_map()
         insert_prompt(response_message.id, response_message.channel.id, interaction.user.mention, command_name, values_map)
 
-        interaction = await MyBotInteraction.create(bot=None, data=comfy_ui_command)
+        # interaction = await MyBotInteraction.create(bot=None, data=comfy_ui_command)
 
-        queue_response = await queue_prompt(interaction.get_prompt())
+        queue_response = await queue_prompt(comfy_ui_command.get_prompt())
         prompt_id = queue_response['prompt_id']
         update_prompt_id_for_message_id(response_message.id, prompt_id)
         log.info("done with regenerate action")

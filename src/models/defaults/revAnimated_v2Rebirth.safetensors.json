@@ -1,6 +1,8 @@
 {
   "width": 512,
   "height": 512,
-  "cfg": 7.0,
-  "steps": 25
+  "cfg": 8.5,
+  "steps": 30,
+  "sampler": "dpmpp_2m",
+  "scheduler": "karras"
 }
