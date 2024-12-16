@@ -5,7 +5,7 @@ import discord
 
 log = logging.getLogger(__name__)
 
-class GetLogs(MyCommand):
+class QueueInformation(MyCommand):
     def __init__(self, bot: discord.Bot):
         self.bot = bot
 

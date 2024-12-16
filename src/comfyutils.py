@@ -5,6 +5,7 @@ import json
 import logging
 import aiohttp
 import uuid
+import discord
 from typing import List
 
 # API documentation: https://github.com/comfyanonymous/ComfyUI/blob/master/server.py
@@ -13,13 +14,6 @@ server_address = "127.0.0.1:8188"
 client_id = str(uuid.uuid4())
 log = logging.getLogger(__name__)
 
-
-# async def queue_new_prompt(interaction: MyBotInteraction):
-#     log.info("Queueing prompt")
-#     prompt = interaction.get_prompt()
-#     queue_response = await queue_prompt(prompt)
-#     interaction.prompt_id = queue_response['prompt_id']
-#     log.info(f"Got prompt id: {interaction.prompt_id}")
 
 async def queue_prompt(prompt):
     async with aiohttp.ClientSession() as session:
@@ -56,3 +50,12 @@ async def get_schedulers(*args, **kwargs) -> List[str]:
             if r.status == 200:
                 js = await r.json()
                 return js['KSampler']['input']['required']['scheduler'][0]
+
+async def post_image(name: str, attachment: discord.Attachment):
+    async with aiohttp.ClientSession() as session:
+        file = await attachment.to_file()
+        data = aiohttp.FormData()
+        data.add_field('image', file.fp, filename=name, content_type=attachment.content_type)
+        async with session.post("http://{}/upload/image".format(server_address), data=data) as r:
+            if r.status != 200:
+                raise Exception("Error uploading image")
