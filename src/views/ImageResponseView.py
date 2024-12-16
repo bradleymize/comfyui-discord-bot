@@ -1,6 +1,7 @@
 import json
 from collections import namedtuple
 import discord
+import random
 
 from src.botutils import ComfyUICommand, get_and_fill_template
 from src.comfyutils import queue_prompt
@@ -35,11 +36,11 @@ class ImageResponseView(discord.ui.View):
         prompt_values['seed'] = None
 
         if command_name == 'anime':
-            values_map = prompt_values
+            values_map = {k: v for k, v in prompt_values.items() if v is not None}
+            values_map['seed'] = random.getrandbits(64)
             prompt_config = get_and_fill_template(values_map)
             prompt = json.loads(prompt_config)
 
-            del values_map['workflow']
             if values_map['prompt'] is None:
                 del values_map['prompt']
             if values_map['negative_prompt'] is None:
@@ -79,8 +80,8 @@ class ImageResponseView(discord.ui.View):
         else:
             prompt_values = json.loads(prompt_info.prompt_values)
 
-            if prompt_info.command_name == 'anime':
-                del prompt_info['workflow']
+            if prompt_info.command_name == 'anime' and 'workflow' in prompt_values:
+                del prompt_values['workflow']
 
             msg = f"```\n/{prompt_info.command_name} "
             for key, value in prompt_values.items():

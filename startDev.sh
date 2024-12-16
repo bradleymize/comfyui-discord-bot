@@ -2,6 +2,7 @@
 
 docker run \
   --rm \
+  --name discord-bot-dev \
   -v .:/app \
   -w /app \
   -u "$(id -u):$(id -g)" \

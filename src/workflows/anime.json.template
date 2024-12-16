@@ -93,7 +93,7 @@
   "12": {
     "inputs": {
       "pixels": [
-        "10",
+        "24",
         0
       ],
       "vae": [
@@ -124,7 +124,7 @@
       "coarse": "disable",
       "resolution": 512,
       "image": [
-        "10",
+        "24",
         0
       ]
     },
@@ -171,6 +171,22 @@
     "class_type": "ControlNetApplyAdvanced",
     "_meta": {
       "title": "Apply ControlNet"
+    }
+  },
+  "24": {
+    "inputs": {
+      "side_length": 1024,
+      "side": "Shortest",
+      "upscale_method": "nearest-exact",
+      "crop": "disabled",
+      "image": [
+        "10",
+        0
+      ]
+    },
+    "class_type": "DF_Image_scale_to_side",
+    "_meta": {
+      "title": "Image scale to side"
     }
   },
   "save_image_websocket_node": {
