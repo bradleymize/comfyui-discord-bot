@@ -1,6 +1,5 @@
 # https://discord.com/oauth2/authorize?client_id=1304485175660515408&permissions=277025703936&integration_type=0&scope=bot
 import discord
-import dotenv
 import os
 import logging
 import datetime
@@ -36,9 +35,6 @@ setup_logger()
 log = logging.getLogger(__name__)
 
 async def main():
-    log.info("Loading environment")
-    dotenv.load_dotenv()
-
     log.info("Initializing database")
     initialize_database()
 

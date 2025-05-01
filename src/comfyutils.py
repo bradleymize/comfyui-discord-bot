@@ -7,10 +7,11 @@ import aiohttp
 import uuid
 import discord
 from typing import List
+import os
 
 # API documentation: https://github.com/comfyanonymous/ComfyUI/blob/master/server.py
 
-server_address = "127.0.0.1:8188"
+server_address = os.getenv('COMFYUI_ADDRESS') #"127.0.0.1:8188"
 client_id = str(uuid.uuid4())
 log = logging.getLogger(__name__)
 
