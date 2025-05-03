@@ -1,0 +1,36 @@
+[
+  {
+    "title": "Boleromix(Pony) v2.10",
+    "url": "https://civitai.com/models/448716/boleromixpony",
+    "image": "https://b-rad.dev/images/ai/boleromix-sdxl-v1-3/sample-01.png",
+    "color": "0x3498db",
+    "description": "1\n```\n/basic prompt: masterpiece,ultra-detailed,best quality,8K,illustration,cute face,clean skin ,shiny hair,girl,ultra-detailed-eyes,simple background, <lora:add-detail-xl:1>,cowboy shot model: boleromixPony_v210.safetensors negative_prompt: negativeXL_D,(worst quality,extra legs,extra arms,extra ears,bad fingers,extra fingers,bad anatomy, missing fingers, lowres,username, artist name, text,pubic hair,cartoon,bar censor,censored,multipul angle,split view:1.0) seed: 15513676531626419234 width: 512 height: 1024 steps: 15 cfg: 7\n```\nRecommended defaults",
+    "fields": [
+      {
+        "name": "Width",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Height",
+        "value": "1024",
+        "inline": true
+      },
+      {
+        "name": "Steps",
+        "value": "25",
+        "inline": true
+      },
+      {
+        "name": "CFG",
+        "value": "7.0",
+        "inline": true
+      },
+      {
+        "name": "Is NSFW",
+        "value": "Yes",
+        "inline": true
+      }
+    ]
+  }
+]

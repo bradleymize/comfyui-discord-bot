@@ -1,6 +1,7 @@
 import json
 import logging
 import discord
+import os
 
 from src.interface.MyCommand import MyCommand
 from src.botutils import ComfyUICommand
@@ -16,7 +17,7 @@ class Flux(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'flux',
+            'name': 'flux' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-flux',
             'description': 'Creates an AI image using ComfyUI (using the flux workflow)'
         }
         self.options = [

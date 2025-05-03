@@ -2,7 +2,13 @@
 
 timestamp="$(date "+%Y%m%d-%H%M%S")"
 
-echo "${timestamp}" > version
+if [[ "${1}" == "dev" ]]; then
+  echo "Building dev image"
+  echo "${timestamp}" > versionDev
+else
+  echo "Building prod image"
+  echo "${timestamp}" > version
+fi
 
 docker buildx build \
   --network host \

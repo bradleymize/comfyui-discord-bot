@@ -2,6 +2,7 @@ import json
 import logging
 import discord
 import random
+import os
 
 from src.interface.MyCommand import MyCommand
 from src.botutils import ComfyUICommand, get_and_fill_template
@@ -17,7 +18,7 @@ class Anime(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'anime',
+            'name': 'anime' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-anime',
             'description': 'Converts an image to anime style'
         }
         self.options = [

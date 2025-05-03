@@ -11,6 +11,8 @@ def namedtuple_factory(cursor, row):
     cls = namedtuple("Row", fields)
     return cls._make(row)
 
+# TODO: Switch to postgres database
+
 dbname = "database-dev.db"
 if os.getenv("BOT_TYPE") == "PRODUCTION":
     dbname = "database-prod.db"

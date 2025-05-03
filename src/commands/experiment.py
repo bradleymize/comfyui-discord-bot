@@ -4,6 +4,7 @@ from src.comfyutils import get_sampler_names, get_schedulers
 from src.interface.MyCommand import MyCommand
 import logging
 import discord
+import os
 
 log = logging.getLogger(__name__)
 
@@ -15,7 +16,7 @@ class Experiment(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'experiment',
+            'name': 'experiment' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-experiment',
             'description': 'Command to test experimental features'
         }
         self.options = []

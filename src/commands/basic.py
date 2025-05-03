@@ -1,6 +1,7 @@
 import json
 import logging
 import discord
+import os
 
 from src.interface.MyCommand import MyCommand
 from src.botutils import ComfyUICommand
@@ -16,7 +17,7 @@ class Basic(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'basic',
+            'name': 'basic' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-basic',
             'description': 'Creates an AI image using ComfyUI (using the basic workflow)'
         }
         self.options = [

@@ -2,6 +2,7 @@ from src.logger import LastNLinesHandler
 from src.interface.MyCommand import MyCommand
 import logging
 import discord
+import os
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ class GetLogs(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'get-logs',
+            'name': 'get-logs' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-get-logs',
             'description': 'Retrieves the last 100 log statements'
         }
         self.options = []

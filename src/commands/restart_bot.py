@@ -1,6 +1,8 @@
 from src.interface.MyCommand import MyCommand
 import logging
 import discord
+import os
+
 from src.views.ImageResponseView import ImageResponseView
 
 log = logging.getLogger(__name__)
@@ -13,7 +15,7 @@ class RestartBot(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'restart-bot',
+            'name': 'restart-bot' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-restart-bot',
             'description': "If the buttons aren't working, run this command"
         }
         self.options = []

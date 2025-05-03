@@ -2,6 +2,7 @@ from src.interface.MyCommand import MyCommand
 import logging
 import discord
 import json
+import os
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ class ModelInfo(MyCommand):
 
     def init(self):
         self.cmd_meta = {
-            'name': 'model-info',
+            'name': 'model-info' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-model-info',
             'description': 'Retrieve basic information about a model'
         }
         self.options = [
@@ -28,10 +29,11 @@ class ModelInfo(MyCommand):
         super().register_command()
 
 
+    # TODO: Derive this from the comfyui volume mount
     def get_models(self, ctx: discord.commands.context.AutocompleteContext):
         # Construct from: https://embed.dan.onl/
         models = [
-            discord.OptionChoice("Boleromix(SDXL) v1.3", "boleromixSDXL_v13.safetensors.json"),
+            discord.OptionChoice("Boleromix(Pony) v2.10", "boleromixPony_v210.safetensors.json"),
             discord.OptionChoice("DreamShaper XL Turbo v2.1", "dreamshaperXL_v21TurboDPMSDE.safetensors.json"),
             discord.OptionChoice("PixelWave FLUX Schnell v3", "pixelwave_flux1Schnell03.safetensors.json"),
             discord.OptionChoice("Pony Diffusion XL v6", "ponyDiffusionV6XL_v6StartWithThisOne.safetensors.json"),
