@@ -3,6 +3,7 @@ import logging
 import discord
 import json
 import os
+from pathlib import Path
 
 log = logging.getLogger(__name__)
 
@@ -29,15 +30,15 @@ class ModelInfo(MyCommand):
         super().register_command()
 
 
-    # TODO: Derive this from the comfyui volume mount
     def get_models(self, ctx: discord.commands.context.AutocompleteContext):
-        # Construct from: https://embed.dan.onl/
+        directory_path = Path(os.getenv('COMFYUI_MODEL_CHECKPOINT_PATH'))
+        safetensor_files = sorted(
+            f.stem for f in directory_path.glob('*.safetensors') if f.is_file()
+        )
+
         models = [
-            discord.OptionChoice("Boleromix(Pony) v2.10", "boleromixPony_v210.safetensors.json"),
-            discord.OptionChoice("DreamShaper XL Turbo v2.1", "dreamshaperXL_v21TurboDPMSDE.safetensors.json"),
-            discord.OptionChoice("PixelWave FLUX Schnell v3", "pixelwave_flux1Schnell03.safetensors.json"),
-            discord.OptionChoice("Pony Diffusion XL v6", "ponyDiffusionV6XL_v6StartWithThisOne.safetensors.json"),
-            discord.OptionChoice("ReV Animated Rebirth v2", "revAnimated_v2Rebirth.safetensors.json")
+            discord.OptionChoice(name, f"{name}.safetensors.json")
+            for name in safetensor_files
         ]
         return models
 
@@ -49,8 +50,9 @@ class ModelInfo(MyCommand):
     ):
         log.info(f"Getting information about {model}")
         embeds = []
-        with open(f'src/models/info/{model}') as f:
-            model_embeds_info = json.load(f)
+        try:
+            with open(f'src/models/info/{model}') as f:
+                model_embeds_info = json.load(f)
 
             for embed_info in model_embeds_info:
                 fields = None
@@ -65,6 +67,13 @@ class ModelInfo(MyCommand):
                     for field in fields:
                         embed.add_field(**field)
                 embeds.append(embed)
+        except FileNotFoundError:
+            embed = discord.Embed(
+                color=int("0x3498db", 16),
+                title=f"{model.removesuffix('.safetensors.json')} model information not found",
+                description=f"Unable to find the model information for {model.removesuffix('.safetensors.json')} at this time. Sorry"
+            )
+            embeds.append(embed)
 
         log.info("Sending response")
         await ctx.send_response(embeds=embeds, ephemeral=True)

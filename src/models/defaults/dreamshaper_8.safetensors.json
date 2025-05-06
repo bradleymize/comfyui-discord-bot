@@ -1,0 +1,8 @@
+{
+  "width": 512,
+  "height": 512,
+  "cfg": 7.0,
+  "steps": 25,
+  "sampler": "euler_ancestral",
+  "scheduler": "normal"
+}

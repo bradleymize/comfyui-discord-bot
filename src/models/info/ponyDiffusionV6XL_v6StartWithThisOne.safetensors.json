@@ -2,9 +2,9 @@
   {
     "title": "Pony Diffusion XL v6",
     "url": "https://civitai.com/models/257749?modelVersionId=290640",
-    "image": "https://b-rad.dev/images/ai/ponydiffusion-xl-v6/sample-01.png",
+    "image": "https://b-rad.dev/images/ai/ponydiffusion-xl-v6/sample-05.png",
     "color": "0x3498db",
-    "description": "1\n```\n/basic prompt: score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, anthro mouse gadget hackwrench, blonde hair model: ponyDiffusionV6XL_v6StartWithThisOne.safetensors seed: 1029115117 width: 869 height: 1152 steps: 30 cfg: 8.5\n```\nRecommended defaults",
+    "description": "1\n```\n/basic prompt: score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, anthro mouse gadget hackwrench, blonde hair model: ponyDiffusionV6XL_v6StartWithThisOne.safetensors seed: 447917134073376 width: 872 height: 1152 steps: 30 cfg: 8.5\n```\n2\n```\n/basic prompt: score_9, score_8_up, score_7_up, MythP0rt, Expressiveh, HD, arctic fox ears, 1girl, solo, athletic body, aesthetic face, shoulder length white hair, glowing eyes, golden eyes, round eyes, very small nose, big ears, small lips, small mouth, cheeky smile, dedicated face, enthusiastic face, smug smile beautiful, blue sky background with cloud, ground view, sitting in the snow, model: ponyDiffusionV6XL_v6StartWithThisOne.safetensors negative_prompt: score_6, score_5, score_4, earrings, jewelry, blurry, worst quality, low quality, bad anatomy, anthro, bad hands, missing fingers, fewer digits, furry, ugly, simple background, empty background, eastern, asian eyes, multiple people, evil smile, scary smile, bangs, big nose, long nose, small ears, seed: 618197479674766 width: 832 height: 1216 steps: 30 cfg: 7.0\n```\n3\n```\n/basic prompt: Score_9, Score8_up, Score_7_up, beautiful, Loona, helluva boss, black goth outfit, evening, dramatic lighting, dark background, source_furry model: ponyDiffusionV6XL_v6StartWithThisOne.safetensors seed: 327502883394085 width: 832 height: 1216 steps: 25 cfg: 8.5\n```\n4\n```\n/basic prompt: Score_9, Score8_up, Score_7_up, princess zelda, breath of the wild, long hair, outdoors, happy, ecstatic, smiling, jumping in the air, hands in a fist, black leggings, intricate outfit, detailed, shading model: ponyDiffusionV6XL_v6StartWithThisOne.safetensors seed: 366134135906586 width: 832 height: 1216 steps: 25 cfg: 8.5\n```\nRecommended defaults",
     "fields": [
       {
         "name": "Width",
@@ -32,5 +32,17 @@
         "inline": true
       }
     ]
+  },
+  {
+    "url": "https://civitai.com/models/257749?modelVersionId=290640",
+    "image": "https://b-rad.dev/images/ai/ponydiffusion-xl-v6/sample-02.png"
+  },
+  {
+    "url": "https://civitai.com/models/257749?modelVersionId=290640",
+    "image": "https://b-rad.dev/images/ai/ponydiffusion-xl-v6/sample-03.png"
+  },
+  {
+    "url": "https://civitai.com/models/257749?modelVersionId=290640",
+    "image": "https://b-rad.dev/images/ai/ponydiffusion-xl-v6/sample-04.png"
   }
 ]

@@ -2,9 +2,9 @@
   {
     "title": "Boleromix(Pony) v2.10",
     "url": "https://civitai.com/models/448716/boleromixpony",
-    "image": "https://b-rad.dev/images/ai/boleromix-sdxl-v1-3/sample-01.png",
+    "image": "https://b-rad.dev/images/ai/boleromix-pony-v2-10/sample-02.png",
     "color": "0x3498db",
-    "description": "1\n```\n/basic prompt: masterpiece,ultra-detailed,best quality,8K,illustration,cute face,clean skin ,shiny hair,girl,ultra-detailed-eyes,simple background, <lora:add-detail-xl:1>,cowboy shot model: boleromixPony_v210.safetensors negative_prompt: negativeXL_D,(worst quality,extra legs,extra arms,extra ears,bad fingers,extra fingers,bad anatomy, missing fingers, lowres,username, artist name, text,pubic hair,cartoon,bar censor,censored,multipul angle,split view:1.0) seed: 15513676531626419234 width: 512 height: 1024 steps: 15 cfg: 7\n```\nRecommended defaults",
+    "description": "1\n```\n/basic prompt: (masterpiece, 2.5D:1.2), (score_9, score_8_up, score_7_up,source_anime), (ultra-detailed,24K), best quality, CG, illustration, european, backlighting silhouette, girl. (chocolate skin, white hair. amber eyes:1.3). (holding spear, Flagged spear:1.2), (Chevalier uniform, gold wreath, girl who wears flames all over her body:1.2), ultra-detailed background, in mountain crater, model: boleromixPony_v210.safetensors negative_prompt: nsfw, (worst quality, low quality, nomal quality), lowres, (bad), text, error, fewer, extra, score_6, score_5, score_4, source_cartoon, (chocolate:1.3), (Funny hands, deformed hands:1.3), animals, furry, wave, sea, water, (extra fingers, extra arms, extra hands, extra legs:1.3), Distorted faces, unnatural poses, easynegative, bad_prompt_version2, bad_prompt_version2-neg, seed: 1574676797 width: 832 height: 1216 steps: 20 cfg: 8.0\n```\n2\n```\n/basic prompt: score_9, score_8_up, score_7_up, score_6_up, Elsa model: boleromixPony_v210.safetensors negative_prompt: score_5, score_4, seed: 801536066 width: 832 height: 1216 steps: 30 cfg: 5.5 sampler: euler_ancestral scheduler: normal\n```\n3\n```\n/basic prompt: highres, hi res, best quality, masterpiece, intricate details, absurdres, 4k, semi realistic, score_9, score_8_up, score_7_up, source_anime, high res image, masterpiece, best quality, simple background, <lora:suit_pony_V1.0:1>, CharacterDesignIllustrious, reference sheet, simple white background, (color guide:1.2), EyesHD, high gradient eyes, detailed eyes, high definition eyes, suit, pants, black necktie, secret agent outfit, serious expression, stern expression, scowl, pale skin, white skin, ashy skin, black hair, straight hair, medium-length hair, bangs, straight-cut hair, neat hair, shiny hair, grey eyes, ultra detailed eyes, model: boleromixPony_v210.safetensors negative_prompt: score_6, score_5, score_4, ugly face, low res, interlocked fingers, anatomically incorrect hands, bad anatomy, pony, furry, censored, worst quality, low quality, displeasing, censored, bar censor, negative_hand, source_pony, watermark, signature, artist name, patreon username, text, monochrome, blurry, signature, logo, lowres, worst quality, low quality, realistic, 3d, low quality, bad quality, poor quality, low res, text, cutoff, cropping, out of frame, (head out of frame:2), four fingers, three fingers, patreon, watermark, logo, extra legs, extra arms, extra limbs, long torso, jpeg artifacts, compression, comic, panels, nipples visible through clothes, blurry, text, letters, shirt text, fish eye, detached collar, multiple views, multiple characters, background characters, shaved head, bald, chest hair, people in background, seed: 1972309710 width: 832 height: 1216 steps: 50 cfg: 10.0\n```\nRecommended defaults",
     "fields": [
       {
         "name": "Width",
@@ -32,5 +32,13 @@
         "inline": true
       }
     ]
+  },
+  {
+    "url": "https://civitai.com/models/448716/boleromixpony",
+    "image": "https://b-rad.dev/images/ai/boleromix-pony-v2-10/sample-03.png"
+  },
+  {
+    "url": "https://civitai.com/models/448716/boleromixpony",
+    "image": "https://b-rad.dev/images/ai/boleromix-pony-v2-10/sample-04.png"
   }
 ]

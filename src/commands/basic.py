@@ -106,6 +106,7 @@ class Basic(MyCommand):
         return models
 
 
+    # TODO: Add clip skip support and to basic.json.template
     async def command(
             self,
             ctx: discord.ApplicationContext,

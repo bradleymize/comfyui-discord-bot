@@ -1,0 +1,48 @@
+[
+  {
+    "title": "DreamShaper 8",
+    "url": "https://civitai.com/models/4384?modelVersionId=128713",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-8/sample-05.png",
+    "color": "0x3498db",
+    "description": "1\n```\n/basic prompt: avant-garde blue model: dreamshaper_8.safetensors seed: 472649800624103 width: 512 height: 768 steps: 20 cfg: 3.5\n```\n2\n```\n/basic prompt: scifi scenery, outdoors, scenery, tree, flower, sky, day, nature, mountain, grass, starry sky, string of flags, landscape, field, fantasy, forest, cloud, 1girl, photorealistic, at night, <lora:XL-futurism-extraordinaire:1> model: dreamshaper_8.safetensors seed: 415649610 width: 512 height: 768 steps: 30 cfg: 5.0 sampler: dpmpp_2m scheduler: karras\n```\n3\n```\n/basic prompt: A dystopian aesthetics landscape model: dreamshaper_8.safetensors seed: 924464577 width: 512 height: 768 steps: 20 cfg: 3.0\n```\n4\n```\n/basic prompt: mountain,water,splash,sky,,fantasy,dream,dragon,dragon,,fantasy,night,flame,realstic,moon, model: dreamshaper_8.safetensors negative_prompt: bad artist, seed: 684442983126701 width: 512 height: 512 steps: 30 cfg: 5.0\n```\nRecommended defaults",
+    "fields": [
+      {
+        "name": "Width",
+        "value": "512",
+        "inline": true
+      },
+      {
+        "name": "Height",
+        "value": "512",
+        "inline": true
+      },
+      {
+        "name": "Steps",
+        "value": "25",
+        "inline": true
+      },
+      {
+        "name": "CFG",
+        "value": "7.0",
+        "inline": true
+      },
+      {
+        "name": "Is NSFW",
+        "value": "Yes",
+        "inline": true
+      }
+    ]
+  },
+  {
+    "url": "https://civitai.com/models/4384?modelVersionId=128713",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-8/sample-06.png"
+  },
+  {
+    "url": "https://civitai.com/models/4384?modelVersionId=128713",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-8/sample-07.png"
+  },
+  {
+    "url": "https://civitai.com/models/4384?modelVersionId=128713",
+    "image": "https://b-rad.dev/images/ai/dreamshaper-8/sample-08.png"
+  }
+]
