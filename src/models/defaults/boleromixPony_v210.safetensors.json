@@ -1,6 +1,6 @@
 {
-  "width": 1024,
-  "height": 1024,
+  "width": 512,
+  "height": 512,
   "cfg": 7.0,
   "steps": 25,
   "sampler": "dpmpp_2m",
