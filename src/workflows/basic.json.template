@@ -1,5 +1,5 @@
 {
-  "3": {
+  "10": {
     "inputs": {
       "seed": ${seed},
       "steps": ${steps},
@@ -8,19 +8,19 @@
       "scheduler": "${scheduler}",
       "denoise": 1,
       "model": [
-        "4",
+        "19",
         0
       ],
       "positive": [
-        "6",
-        0
+        "19",
+        2
       ],
       "negative": [
-        "7",
+        "14",
         0
       ],
       "latent_image": [
-        "5",
+        "12",
         0
       ]
     },
@@ -29,7 +29,7 @@
       "title": "KSampler"
     }
   },
-  "4": {
+  "11": {
     "inputs": {
       "ckpt_name": "${model}"
     },
@@ -38,7 +38,7 @@
       "title": "Load Checkpoint"
     }
   },
-  "5": {
+  "12": {
     "inputs": {
       "width": ${width},
       "height": ${height},
@@ -49,25 +49,12 @@
       "title": "Empty Latent Image"
     }
   },
-  "6": {
-    "inputs": {
-      "text": "${prompt}",
-      "clip": [
-        "4",
-        1
-      ]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "7": {
+  "14": {
     "inputs": {
       "text": "${negative_prompt}",
       "clip": [
-        "4",
-        1
+        "18",
+        0
       ]
     },
     "class_type": "CLIPTextEncode",
@@ -75,14 +62,14 @@
       "title": "CLIP Text Encode (Prompt)"
     }
   },
-  "8": {
+  "15": {
     "inputs": {
       "samples": [
-        "3",
+        "10",
         0
       ],
       "vae": [
-        "4",
+        "11",
         2
       ]
     },
@@ -92,12 +79,50 @@
     }
   },
   "save_image_websocket_node": {
-      "class_type": "SaveImageWebsocket",
-      "inputs": {
-        "images": [
-          "8",
-          0
-        ]
-      }
+    "inputs": {
+      "images": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "SaveImageWebsocket",
+    "_meta": {
+      "title": "SaveImageWebsocket"
     }
+  },
+  "18": {
+    "inputs": {
+      "stop_at_clip_layer": -2,
+      "clip": [
+        "11",
+        1
+      ]
+    },
+    "class_type": "CLIPSetLastLayer",
+    "_meta": {
+      "title": "CLIP Set Last Layer"
+    }
+  },
+  "19": {
+    "inputs": {
+      "wildcard_text": "${prompt}",
+      "populated_text": "",
+      "mode": "populate",
+      "Select to add LoRA": "Select the LoRA to add to the text",
+      "Select to add Wildcard": "Select the Wildcard to add to the text",
+      "seed": 592658530799645,
+      "model": [
+        "11",
+        0
+      ],
+      "clip": [
+        "11",
+        1
+      ]
+    },
+    "class_type": "ImpactWildcardEncode",
+    "_meta": {
+      "title": "ImpactWildcardEncode"
+    }
+  }
 }

@@ -4,3 +4,6 @@
 .coverage
 *.pyc
 *.db
+development
+production
+docker-compose.dev.yaml
