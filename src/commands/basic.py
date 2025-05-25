@@ -6,7 +6,7 @@ import os
 from src.interface.MyCommand import MyCommand
 from src.botutils import ComfyUICommand
 from src.comfyutils import queue_prompt, get_sampler_names, get_schedulers
-from src.database import insert_prompt, update_prompt_id_for_message_id
+from src.database import insert_prompt, update_prompt_id_for_message_id, insert_everything
 
 log = logging.getLogger(__name__)
 
@@ -92,6 +92,15 @@ class Basic(MyCommand):
                 'description': "The sampler to use",
                 'autocomplete': discord.utils.basic_autocomplete(get_schedulers)
             },
+            {
+                'name': 'batch',
+                'type': discord.SlashCommandOptionType.integer,
+                'required': False,
+                'default': 1,
+                'min_value': 1,
+                'max_value': 4,
+                'description': "Number of images to generate (1-4)"
+            },
         ]
         self.fn = self.command
         super().register_command()
@@ -119,34 +128,38 @@ class Basic(MyCommand):
             steps: int = None,
             cfg: float = None,
             sampler: str = None,
-            scheduler: str = None
+            scheduler: str = None,
+            batch: int = 1
     ):
         log.info("Running basic command")
 
-        log.info("Creating new ComfyUICommand object")
-        comfy_ui_command = ComfyUICommand(
-            ctx=ctx,
-            workflow="basic.json.template",
-            prompt=prompt,
-            negative_prompt=negative_prompt,
-            model=model,
-            seed=seed,
-            width=width,
-            height=height,
-            steps=steps,
-            cfg=cfg,
-            sampler=sampler,
-            scheduler=scheduler
-        )
-        values_map = comfy_ui_command.get_values_map()
+        # comfyui basic command thing originally here
 
         await ctx.response.send_message(f"Queueing new image, {ctx.user.mention}")
         response_message = await ctx.interaction.original_response()
-        insert_prompt(response_message.id, response_message.channel.id, ctx.user.mention, self.cmd_meta['name'], values_map)
+        # insert_prompt(response_message.id, response_message.channel.id, ctx.user.mention, self.cmd_meta['name'], values_map)
 
         # interaction = await MyBotInteraction.create(bot=self.bot, data=comfy_ui_command)
 
-        queue_response = await queue_prompt(comfy_ui_command.get_prompt())
-        prompt_id = queue_response['prompt_id']
-        update_prompt_id_for_message_id(response_message.id, prompt_id)
+        for i in range(batch):
+            log.info("Creating new ComfyUICommand object")
+            comfy_ui_command = ComfyUICommand(
+                ctx=ctx,
+                workflow="basic.json.template",
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                model=model,
+                seed=seed,
+                width=width,
+                height=height,
+                steps=steps,
+                cfg=cfg,
+                sampler=sampler,
+                scheduler=scheduler
+            )
+            values_map = comfy_ui_command.get_values_map()
+            queue_response = await queue_prompt(comfy_ui_command.get_prompt())
+            prompt_id = queue_response['prompt_id']
+            # update_prompt_id_for_message_id(response_message.id, prompt_id)
+            insert_everything(response_message.id, response_message.channel.id, ctx.user.mention, self.cmd_meta['name'], prompt_id, values_map)
         log.info("done with basic command")

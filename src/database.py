@@ -45,6 +45,14 @@ def insert_prompt(message_id, channel_id, mention_user, command_name, prompt_dat
     cursor.close()
 
 
+def insert_everything(message_id, channel_id, mention_user, command_name, prompt_id, prompt_data):
+    log.info(f"Inserting {message_id} into database for {command_name}")
+    data = (message_id, channel_id, mention_user, command_name, prompt_id, json.dumps(prompt_data, indent=2))
+    cursor = connection.cursor()
+    cursor.execute("INSERT INTO comfyui (discord_message_id, channel_id, mention_user, command_name, prompt_id, prompt_values) VALUES (?, ?, ?, ?, ?, ?)", data)
+    cursor.close()
+
+
 def get_prompt_information_for_message_id(message_id):
     cursor = connection.cursor()
     res = cursor.execute("SELECT command_name, prompt_values FROM comfyui WHERE discord_message_id = ?", (message_id,))
