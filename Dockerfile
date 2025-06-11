@@ -6,7 +6,9 @@ COPY ./src /app/src
 COPY requirements.txt /app/requirements.txt
 COPY run.py /app/run.py
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && \
+    rm -rf /app/src/models && \
+    rm -rf /app/src/workflows
 
 ENTRYPOINT ["python"]
 CMD ["run.py"]

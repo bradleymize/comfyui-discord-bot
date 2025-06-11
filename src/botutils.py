@@ -58,6 +58,7 @@ class ComfyUICommand():
         self.cfg = cfg or defaults['cfg']
         self.sampler = sampler or defaults['sampler']
         self.scheduler = scheduler or defaults['scheduler']
+        self.wildcard_seed = random.getrandbits(64)
 
     def get_values_map(self) -> dict:
         return {
@@ -71,7 +72,8 @@ class ComfyUICommand():
             'prompt': self.prompt,
             'negative_prompt': self.negative_prompt,
             'sampler': self.sampler,
-            'scheduler': self.scheduler
+            'scheduler': self.scheduler,
+            'wildcard_seed': self.wildcard_seed
         }
 
     def get_prompt(self):
