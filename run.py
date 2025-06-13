@@ -44,10 +44,10 @@ async def connect_and_listen(server_address, my_client_id):
                 log.info(f"Connected to {server_address}, listening...")
                 await comfyui_watcher.listen_for_comfyui_messages(websocket)
         except (ConnectionClosed, WebSocketException, asyncio.TimeoutError) as e:
-            if server_address != "10.0.0.21:8188":
+            if server_address != all_servers.split(",")[0]:
                 log.warning(f"WebSocket error with {server_address}: {e}. Reconnecting in 5s...")
         except Exception as e:
-            if server_address != "10.0.0.21:8188":
+            if server_address != all_servers.split(",")[0]:
                 log.exception(f"Unexpected error with {server_address}: {e}. Reconnecting in 5s...")
         await asyncio.sleep(5)  # Wait before trying to reconnect
 
