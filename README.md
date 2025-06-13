@@ -9,6 +9,10 @@ Within the development environment created above, run
 ```bash
 python run.py
 ```
+Scaling down the deployment
+```bash
+kubectl -n comfyui-discord-bot scale deployment comfyui-discord-bot-dev --replicas 0
+```
 
 # Tests
 Within the development environment created above, run

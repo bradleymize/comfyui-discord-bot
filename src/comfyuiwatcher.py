@@ -3,6 +3,7 @@ import io
 import discord
 import json
 import websockets
+import asyncio
 from src.views.ImageResponseView import ImageResponseView
 from src.database import get_information_prompt_id
 
@@ -21,7 +22,7 @@ async def listen_for_comfyui_messages(ws):
     images = []
     while True:
         try:
-            out = await ws.recv()
+            out = await asyncio.wait_for(ws.recv(), timeout=2)
             if isinstance(out, str):
                 message = json.loads(out)
                 if message['type'] == 'executing':
@@ -50,8 +51,9 @@ async def listen_for_comfyui_messages(ws):
                         current_node = ""
                         current_node_data = None
                         images = []
-        except websockets.exceptions.ConnectionClosedError as e:
-            pass
+        except asyncio.TimeoutError:
+            log.warning("WebSocket recv() timed out — connection may be stale")
+            raise
 
 
 async def respond_with_image(prompt_id, image_array):
