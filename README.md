@@ -29,3 +29,9 @@ pytest --cov --cov-report=html:coverage
 * Merge branch into main
 * Make sure `docker-compose.prod.yaml` version has been updated for image + environment variable
 * Run `docker compse -f docker-compose.prod.yaml up`
+
+# Building new image for helmfile use
+* Run `./buildMultiArch.sh` (for dev images, run `./buildMultiArch.sh dev`)
+* Run `./push.sh` (for dev images, run `./push.sh dev`)
+* Update the image tag in the respective `helmfile.d/file.yaml` file
+* Apply the helmfile (optionally with the name of the specific release to apply)

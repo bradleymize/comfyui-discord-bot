@@ -34,7 +34,8 @@ class ComfyUICommand():
             steps: int = None,
             cfg: float = None,
             sampler: str = None,
-            scheduler: str = None
+            scheduler: str = None,
+            wildcard_seed: int = None
     ):
         self.ctx = ctx
         self.prompt = prompt.replace("\"", "\\\"") # Make prompt JSON friendly
@@ -58,7 +59,7 @@ class ComfyUICommand():
         self.cfg = cfg or defaults['cfg']
         self.sampler = sampler or defaults['sampler']
         self.scheduler = scheduler or defaults['scheduler']
-        self.wildcard_seed = random.getrandbits(64)
+        self.wildcard_seed = wildcard_seed or random.getrandbits(64)
 
     def get_values_map(self) -> dict:
         return {
