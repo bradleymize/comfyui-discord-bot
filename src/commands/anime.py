@@ -19,7 +19,7 @@ class Anime(MyCommand):
     def init(self):
         self.cmd_meta = {
             'name': 'anime' if os.getenv("BOT_TYPE") == 'PRODUCTION' else 'dev-anime',
-            'description': 'Converts an image to anime style'
+            'description': 'Converts an image to anime style (takes anywhere from 30 sec - 2 min)'
         }
         self.options = [
             {
@@ -57,40 +57,12 @@ class Anime(MyCommand):
                 'description': "Number used to help re-create images. Default: (random)"
             },
             {
-                'name': 'steps',
-                'type': discord.SlashCommandOptionType.integer,
-                'required': False,
-                'default': None,
-                'description': "The number of iterations to perform when generating the image. Default: 25"
-            },
-            {
-                'name': 'denoise',
-                'type': discord.SlashCommandOptionType.number,
-                'required': False,
-                'default': None,
-                'description': "How much of the image to replace. Default: 0.65"
-            },
-            {
                 'name': 'strength',
                 'type': discord.SlashCommandOptionType.number,
                 'required': False,
                 'default': None,
-                'description': "How much of the original image should be retained. Default: 0.10 (higher is less anime-like)"
-            },
-            {
-                'name': 'start',
-                'type': discord.SlashCommandOptionType.number,
-                'required': False,
-                'default': None,
-                'description': "When to start applying the layout of the original image. Default: 0 (start at the beginning)"
-            },
-            {
-                'name': 'stop',
-                'type': discord.SlashCommandOptionType.number,
-                'required': False,
-                'default': None,
-                'description': "When to stop applying the layout of the original image. Default: 0.5 (end halfway through)"
-            },
+                'description': "1 = most freedom, 30 = original image. Recommend no more than 15. Default: 8"
+            }
         ]
         self.fn = self.command
         super().register_command()
@@ -104,11 +76,7 @@ class Anime(MyCommand):
             prompt: str = None,
             negative_prompt: str = None,
             seed: str = None,
-            steps: int = None,
-            denoise: float = None,
             strength: float = None,
-            start: float = None,
-            stop: float = None,
     ):
         log.info("Running anime command")
 
@@ -131,11 +99,7 @@ class Anime(MyCommand):
             'prompt': prompt,
             'negative_prompt': negative_prompt,
             'seed': seed,
-            'steps': steps or 25,
-            'denoise': denoise or 0.65,
-            'strength': strength or 0.10,
-            'start': start or 0.0,
-            'stop': stop or 0.5
+            'strength': strength or 8
         }
 
         await ctx.response.send_message(f"Converting image, {ctx.user.mention}")
